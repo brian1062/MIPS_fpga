@@ -3,7 +3,7 @@
 module tb_dist_mem_gen_0;
 
   // Definición de señales
-  reg [9:0] a;        // Dirección de memoria
+  reg [7:0] a;        // Dirección de memoria
   reg [31:0] d;       // Datos de entrada
   reg clk;            // Señal de reloj
   reg we;             // Señal de escritura
@@ -49,7 +49,7 @@ module tb_dist_mem_gen_0;
     // Escritura en la dirección 2
     a = 10'b0000000010;
     d = 32'hEEEE_FFFF;
-    #10;
+    #20;
 
     // Deshabilitar escritura y clock enable
     we = 0;
@@ -60,24 +60,30 @@ module tb_dist_mem_gen_0;
     i_ce = 1;
 
     // Lectura desde la dirección 0
-    #5; // Esperar un ciclo de reloj para lectura
+    #10; // Esperar un ciclo de reloj para lectura
     a = 10'b0000000000;
-    #5;
+    #10;
     $display("Lectura dirección 0: %h (esperado: AAAA_BBBB)", spo);
 
-    #5;
+    #20;
     a = 10'b0000000001;
-    #5;
+    #10;
     $display("Lectura dirección 1: %h (esperado: CCCC_DDDD)", spo);
 
     // Lectura desde la dirección 2
-    #5;
+    #20;
     a = 10'b0000000010;
-    #5;
+    #10;
     $display("Lectura dirección 2: %h (esperado: EEEE_FFFF)", spo);
-
+    a = 10'b0000000011;
+    #10;
     // Fin de la simulación
     $stop;
   end
 
 endmodule
+
+
+
+//!!!! El problema de este ip es que el addr salta de a 32 byte y si el pc=0 
+//!!!! y el siguiente valor es pc+4=4 me salta la direccion 4 siendo que quiero saltar a la 1
