@@ -11,15 +11,20 @@ module mpx_4to1
     input  [NB_INPUT-1:0] i_c       ,  //! is the input to be selected when i_sel is 10
     input  [NB_INPUT-1:0] i_d       ,  //! is the input to be selected when i_sel is 11
     input  [NB_SEL  -1:0] i_sel     ,  //! is the selector
-    output reg [NB_INPUT-1:0] o_out        //! is the output
+    output [NB_INPUT-1:0] o_out        //! is the output
 );
 
-always @(i_sel, i_a, i_b, i_c, i_d)
+    reg [NB_INPUT-1:0] value;
+
+    always @(i_sel, i_a, i_b, i_c, i_d)
     case (i_sel)
-    2'b00: o_out = i_a;
-    2'b01: o_out = i_b;
-    2'b10: o_out = i_c;
-    2'b11: o_out = i_d;
+    2'b00: value = i_a;
+    2'b01: value = i_b;
+    2'b10: value = i_c;
+    2'b11: value = i_d;
+    default: value = i_a;
     endcase
+
+    assign o_out = value;
 
 endmodule
