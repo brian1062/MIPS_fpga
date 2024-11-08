@@ -79,6 +79,8 @@ module tb_pc;
         #10;
         i_reset = 0;
         #10;
+        PCWrite =1;
+        i_enable=1;
         if (pc_out == 32'd0)
             $display("Test 6: Reset final aplicado correctamente, pc_out = %d (Esperado: 0)", pc_out);
         else

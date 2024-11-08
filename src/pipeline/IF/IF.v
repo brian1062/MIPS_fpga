@@ -19,20 +19,20 @@ module IF
     input  [NB_INST-1:0]    i_inst_to_mxp       ,
     input  [NB_REG-1:0 ]    i_pc_jsel           ,
     input  [NB_REG-1:0 ]    i_dunit_data        ,                
-    output [NB_REG-1:0 ]    o_pcplu4            ,
+    output [NB_REG-1:0 ]    o_pcplus4            ,
     output [NB_REG-1:0 ]    o_instruction
 );
 
-wire [NB_REG-1:0] pc_to_mem ;
-wire [NB_REG-1:0] mpx3_to_pc;
-wire mpx2_to_mpx3;
-wire mpx1_to_mpx2;
+wire [NB_REG-1:0] pc_to_mem     ;
+wire [NB_REG-1:0] mpx3_to_pc    ;
+wire [NB_REG-1:0] mpx2_to_mpx3  ;
+wire [NB_REG-1:0] mpx1_to_mpx2  ;
 
 mpx_2to1 #(
     .NB_INPUT(NB_REG)          
 ) u_mpx_1
 (
-    .i_a       (o_pcplu4),   
+    .i_a       (o_pcplus4),   
     .i_b       (i_inmed),   
     .i_sel     (i_PCSrc),  
     .o_out     (mpx1_to_mpx2)  
@@ -43,7 +43,7 @@ mpx_2to1 #(
 ) u_mpx_2
 (
     .i_a       (mpx1_to_mpx2),   
-    .i_b       ({o_pcplus4[31:28], i_inst_to_mxp, 2b'00} ),  // se concatena el pc+4 con la instrucción mas su desplazamiento  
+    .i_b       ( {o_pcplus4[31:28], i_inst_to_mxp, 2'b00}),  // se concatena el pc+4 con la instrucción mas su desplazamiento  
     .i_sel     (i_Jump),  
     .o_out     (mpx2_to_mpx3)  
 );
@@ -63,7 +63,7 @@ pc #(
 ) u_pc (
     .i_clk      (i_clk              ),
     .i_reset    (i_reset            ),
-    .i_enable   (i_enable_f_debug   ),
+    .i_enable   (i_dunit_clk_en     ),
     .PCWrite    (i_PCWrite          ),
     .pc_in      (mpx3_to_pc         ),
     .pc_out     (pc_to_mem          )
@@ -73,7 +73,7 @@ adder_four #(
     .ADDER_WIDTH(NB_REG) 
 ) u_adder_four (
     .a_input     (pc_to_mem         ),
-    .sum         (o_pcplu4          )
+    .sum         (o_pcplus4          )
 );
 
 

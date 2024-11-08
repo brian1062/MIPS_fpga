@@ -18,7 +18,7 @@ module pc
     begin
         if (i_reset)
             pc <= 32'd0;
-        else if (i_enable && PCWrite)
+        else if (i_enable & PCWrite)
             pc <= pc_in;
         else
             pc <= pc;
