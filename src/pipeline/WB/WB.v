@@ -1,4 +1,4 @@
-module WR 
+module WB
 #(
     parameter               NB_REG  = 32
 )(
