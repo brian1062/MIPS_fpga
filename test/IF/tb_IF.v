@@ -98,16 +98,16 @@ initial begin
     // Test 2: Test de Jump
     $display("Test 2: Test de Jump");
     i_PCSrc = 0;
-    //i_Jump = 1;
+    i_Jump = 1;
     i_inmed = 32'h00000040;  // Nuevo valor para Jump
-    #10;
+    #60;
     $display("Después de Jump: PC = 0x%h, Instrucción = 0x%h", o_pcplus4, o_instruction);
     
     // Test 3: Test de JSel
     $display("Test 3: Test de JSel");
     i_JSel = 1;
     i_pc_jsel = 32'h00000080;
-    #10;
+    #50;
     $display("Después de JSel: PC = 0x%h, Instrucción = 0x%h", o_pcplus4, o_instruction);
 
     // Test 4: Test de lectura y escritura en memoria

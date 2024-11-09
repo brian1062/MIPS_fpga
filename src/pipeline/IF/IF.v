@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 module IF
 #(
     parameter               NB_REG  = 32,
@@ -85,7 +86,7 @@ ram_async_single_port #(
       .i_clk       (i_clk       ),
       .i_reset     (i_reset     ),
       .i_we        (i_dunit_w_en),
-      .i_addr      (pc_to_mem   ),
+      .i_addr      (pc_to_mem[NB_WIDHT-1:0] ),
       .i_data_in   (i_dunit_data),
       .o_data_out  (o_instruction)
   );  
