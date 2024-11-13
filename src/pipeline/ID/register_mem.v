@@ -3,14 +3,15 @@ module register_mem
     parameter NB_REG  = 32,
     parameter NB_ADDR =  5
 ) (
-    input                       i_clk    ,
-    input                       i_reset  ,
-    input                       i_enable ,
-    input   [NB_ADDR - 1 : 0]   i_rs_addr,
-    input   [NB_ADDR - 1 : 0]   i_rt_addr,
-    input   [NB_ADDR - 1 : 0]   i_wb_addr,   //from wb
-    input   [NB_REG  - 1 : 0]   i_wb_data,   //from wb
-    output  [NB_REG  - 1 : 0]   o_rs_data,
+    input                       i_clk           ,
+    input                       i_reset         ,
+    input                       i_enable        ,
+    input                       i_dunit_clk_en  ,
+    input   [NB_ADDR - 1 : 0]   i_rs_addr       ,
+    input   [NB_ADDR - 1 : 0]   i_rt_addr       ,
+    input   [NB_ADDR - 1 : 0]   i_wb_addr       ,   //from wb
+    input   [NB_REG  - 1 : 0]   i_wb_data       ,   //from wb
+    output  [NB_REG  - 1 : 0]   o_rs_data       ,
     output  [NB_REG  - 1 : 0]   o_rt_data
 );
 
@@ -25,7 +26,7 @@ always @(negedge i_clk) begin
             reg_mem[i] <= 0;
         end        
     end
-    else if (i_enable) begin
+    else if (i_enable & i_dunit_clk_en) begin
         reg_mem[i_wb_addr] <= i_wb_data;
     end
 
