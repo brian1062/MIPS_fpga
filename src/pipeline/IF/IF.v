@@ -15,7 +15,7 @@ module IF
     input                   i_PCSrc             ,
     input                   i_Jump              ,
     input                   i_JSel              ,
-    input                   i_PCWrite           ,
+    input                   i_PCWrite           ,    //stall from hazardunit
     input  [NB_REG-1:0 ]    i_inmed             ,
     input  [NB_INST-1:0]    i_inst_to_mxp       ,
     input  [NB_REG-1:0 ]    i_pc_jsel           ,
