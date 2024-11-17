@@ -203,13 +203,13 @@ begin
 
             default: 
             begin
-                reg_signals = 20'b0; //change
+                reg_signals = 20'b0; 
             end
         endcase
         
     end
     else begin
-        reg_signals = 20'd0;
+        reg_signals = 20'd0; //NOP SSL 0 0 0 
     end
 end
 
