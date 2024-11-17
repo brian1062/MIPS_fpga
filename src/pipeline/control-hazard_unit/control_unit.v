@@ -1,3 +1,23 @@
+//===========================================
+// Module: control_unit
+// Description:
+//    Generates control signals for the pipeline
+//    based on the opcode and function fields of the instruction.
+//    These signals dictate the behavior of other processor units
+//    (e.g., ALU, memory, and registers) for each instruction.
+// Author: Brian Gerard
+// Created: 15/11/2024
+// Parameters:
+// - NB_SGN: Number of control signals generated (default: 20).
+// - NB_OP: Bit width for opcode and function fields (default: 6).
+// Inputs:
+// - i_enable: Enable signal to activate the control unit.
+// - i_inst_opcode: Opcode field of the instruction [31:26].
+// - i_inst_function: Function field of the instruction [5:0].
+// Outputs:
+// - o_signals: Generated control signals (20 bits).
+//===========================================
+
 module control_unit #(
     parameter NB_SGN  =  20,
     parameter NB_OP   =  6
