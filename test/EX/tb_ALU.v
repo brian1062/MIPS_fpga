@@ -178,6 +178,52 @@ module tb_ALU;
         alu_input_B = 32'h7FFFFFFF; // Número positivo máximo
         #10;
         $display("%0dns\t%b\t%h\t%h\t%h\t%b", $time, o_alu_control_signals, alu_input_A, alu_input_B, o_alu_result, o_alu_condition_zero);
+
+        // Caso 22: Prueba ADD (con signo)
+        o_alu_control_signals = 6'b100000; // ADD
+        alu_input_A = 32'd15;  // Operando 1
+        alu_input_B = 32'd10;  // Operando 2
+        #10;
+        $display("%0dns\t%b\t%h\t%h\t%h\t%b", $time, o_alu_control_signals, alu_input_A, alu_input_B, o_alu_result, o_alu_condition_zero);
+
+        o_alu_control_signals = 6'b100000; // ADD
+        alu_input_A = -32'd15; // Operando 1 negativo
+        alu_input_B = 32'd10;  // Operando 2
+        #10;
+        $display("%0dns\t%b\t%h\t%h\t%h\t%b", $time, o_alu_control_signals, alu_input_A, alu_input_B, o_alu_result, o_alu_condition_zero);
+
+        // Caso 23: Prueba ADDU (sin signo)
+        o_alu_control_signals = 6'b100001; // ADDU
+        alu_input_A = 32'hFFFFFFF0; // Operando 1 sin signo
+        alu_input_B = 32'd20;       // Operando 2
+        #10;
+        $display("%0dns\t%b\t%h\t%h\t%h\t%b", $time, o_alu_control_signals, alu_input_A, alu_input_B, o_alu_result, o_alu_condition_zero);
+
+        // Caso 24: Prueba SUB (con signo)
+        o_alu_control_signals = 6'b100010; // SUB
+        alu_input_A = 32'd20;  // Operando 1
+        alu_input_B = 32'd15;  // Operando 2
+        #10;
+        $display("%0dns\t%b\t%h\t%h\t%h\t%b", $time, o_alu_control_signals, alu_input_A, alu_input_B, o_alu_result, o_alu_condition_zero);
+
+        o_alu_control_signals = 6'b100010; // SUB
+        alu_input_A = 32'd10;  // Operando 1
+        alu_input_B = -32'd5;  // Operando 2 negativo
+        #10;
+        $display("%0dns\t%b\t%h\t%h\t%h\t%b", $time, o_alu_control_signals, alu_input_A, alu_input_B, o_alu_result, o_alu_condition_zero);
+
+        // Caso 25: Prueba SUBU (sin signo)
+        o_alu_control_signals = 6'b100011; // SUBU
+        alu_input_A = 32'd20;        // Operando 1 sin signo
+        alu_input_B = 32'd15;        // Operando 2
+        #10;
+        $display("%0dns\t%b\t%h\t%h\t%h\t%b", $time, o_alu_control_signals, alu_input_A, alu_input_B, o_alu_result, o_alu_condition_zero);
+
+        o_alu_control_signals = 6'b100011; // SUBU
+        alu_input_A = 32'h00000010;  // Operando 1 sin signo
+        alu_input_B = 32'hFFFFFFF0; // Operando 2 sin signo
+        #10;
+        $display("%0dns\t%b\t%h\t%h\t%h\t%b", $time, o_alu_control_signals, alu_input_A, alu_input_B, o_alu_result, o_alu_condition_zero);
         // Fin de la simulación
         $stop;
     end

@@ -73,10 +73,10 @@ initial begin
     mem_write_CU = 0;
 
     // Test 2: Load Word (LW) - Lectura en el flanco negativo
-    @(negedge clk); // Lectura en el flanco negativo
+    @(posedge clk); // Lectura en el flanco negativo
     mem_read_CU = 1;
     BHW_CU      = 3'b011; // LW
-    @(negedge clk); // Lectura completada
+    @(posedge clk); // Lectura completada
     mem_read_CU = 0;
     if (read_data !== 32'h12345678)
         $display("Test LW Failed: Expected 0x12345678, Got 0x%h", read_data);
@@ -84,10 +84,10 @@ initial begin
         $display("Test LW Passed: Read 0x%h", read_data);
 
     // Test 3: Load Word Unsigned (LWU)
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 1;
-    BHW_CU      = 3'b111; // LWU
-    @(negedge clk);
+    BHW_CU      = 3'b111; // SLWU
+    @(posedge clk);
     mem_read_CU = 0;
     if (read_data !== 32'h12345678)
         $display("Test LWU Failed: Expected 0x12345678, Got 0x%h", read_data);
@@ -104,10 +104,10 @@ initial begin
     mem_write_CU = 0;
 
     // Test 5: Load Byte (LB)
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 1;
     BHW_CU      = 3'b000; // LB
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 0;
     if (read_data[7:0] !== 8'hAB)
         $display("Test LB Failed: Expected 0xAB, Got 0x%h", read_data[7:0]);
@@ -115,10 +115,10 @@ initial begin
         $display("Test LB Passed: Read 0x%h", read_data[7:0]);
 
     // Test 6: Load Byte Unsigned (LBU)
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 1;
     BHW_CU      = 3'b100; // LBU
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 0;
     if (read_data[7:0] !== 8'hAB)
         $display("Test LBU Failed: Expected 0xAB, Got 0x%h", read_data[7:0]);
@@ -135,10 +135,10 @@ initial begin
     mem_write_CU = 0;
 
     // Test 8: Load Halfword (LH)
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 1;
     BHW_CU      = 3'b001; // LH
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 0;
     if (read_data[15:0] !== 16'hCDEF)
         $display("Test LH Failed: Expected 0xCDEF, Got 0x%h", read_data[15:0]);
@@ -146,10 +146,10 @@ initial begin
         $display("Test LH Passed: Read 0x%h", read_data[15:0]);
 
     // Test 9: Load Halfword Unsigned (LHU)
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 1;
     BHW_CU      = 3'b101; // LHU
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 0;
     if (read_data[15:0] !== 16'hCDEF)
         $display("Test LHU Failed: Expected 0xCDEF, Got 0x%h", read_data[15:0]);
@@ -166,35 +166,15 @@ initial begin
     mem_write_CU = 0;
 
     // Test 11: Read from lowest address (0x000)
-    @(negedge clk); // Lectura en flanco negativo
+    @(posedge clk); // Lectura en flanco negativo
     mem_read_CU = 1;
     BHW_CU      = 3'b011; // LW
-    @(negedge clk);
+    @(posedge clk);
     mem_read_CU = 0;
     if (read_data !== 32'h00000001)
         $display("Test Read Lowest Address Failed: Expected 0x00000001, Got 0x%h", read_data);
     else
         $display("Test Read Lowest Address Passed: Read 0x%h", read_data);
-
-    // Test 12: Write at highest address (0x1FF, 9-bit address width)
-    //@(posedge clk);
-    //mem_addr    = 9'h1FF; // Address 0x1FF
-    //mem_data    = 32'hFFFFFFFF; // Write data
-    //mem_write_CU = 1;
-    //BHW_CU      = 3'b011; // SW
-    //@(posedge clk);
-    //mem_write_CU = 0;
-
-    // Test 13: Read from highest address (0x1FF)
-    //@(negedge clk);
-    //mem_read_CU = 1;
-    //BHW_CU      = 3'b011; // LW
-    //@(negedge clk);
-    //mem_read_CU = 0;
-    //if (read_data !== 32'hFFFFFFFF)
-    //    $display("Test Read Highest Address Failed: Expected 0xFFFFFFFF, Got 0x%h", read_data);
-    //else
-    //    $display("Test Read Highest Address Passed: Read 0x%h", read_data);
 
     ///////////////////////////////////////////////////////////////
     $finish;

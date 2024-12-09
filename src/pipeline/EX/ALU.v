@@ -38,16 +38,16 @@ module ALU #(
 
 always @(*) begin
     case (o_alu_control_signals)
-        6'b100000: o_alu_result = alu_input_A + alu_input_B;  // ADD
+        6'b100000: o_alu_result = $signed(alu_input_A) + $signed(alu_input_B);  // ADD
         6'b100001: o_alu_result = alu_input_A + alu_input_B;  // ADDU (unsigned add)
-        6'b100010: o_alu_result = alu_input_A - alu_input_B;  // SUB
+        6'b100010: o_alu_result = $signed(alu_input_A) - $signed(alu_input_B);  // SUB
         6'b100011: o_alu_result = alu_input_A - alu_input_B;  // SUBU (unsigned subtract)
         6'b100100: o_alu_result = alu_input_A & alu_input_B;  // AND
         6'b100101: o_alu_result = alu_input_A | alu_input_B;  // OR
         6'b100110: o_alu_result = alu_input_A ^ alu_input_B;  // XOR
         6'b100111: o_alu_result = ~(alu_input_A | alu_input_B); // NOR
-        6'b000000: o_alu_result = alu_input_B << alu_input_A[4:0]; // SLL (Shift Left Logical)
-        6'b000010: o_alu_result = alu_input_B >> alu_input_A[4:0]; // SRL (Shift Right Logical)
+        6'b000000: o_alu_result = $unsigned(alu_input_B) << alu_input_A[4:0]; // SLL (Shift Left Logical)
+        6'b000010: o_alu_result = $unsigned(alu_input_B) >> alu_input_A[4:0]; // SRL (Shift Right Logical)
         6'b000011: o_alu_result = $signed(alu_input_B) >>> alu_input_A[4:0]; // SRA (Shift Right Arithmetic)
         6'b101010: o_alu_result = ($signed(alu_input_A) < $signed(alu_input_B)) ? 1 : 0; // SLT (Set Less Than)
         6'b101011: o_alu_result = (alu_input_A < alu_input_B) ? 1 : 0; // SLTU (Set Less Than Unsigned)

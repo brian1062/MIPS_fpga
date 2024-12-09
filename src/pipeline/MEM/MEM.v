@@ -41,7 +41,10 @@ module MEM #(
 /////////////////////////////////////////////////////////////
 // Internal Signals
 /////////////////////////////////////////////////////////////
-wire [NB_WIDTH-1:0] mem_data_out;
+wire [NB_WIDTH-1:0] mem_data_out;       // Data read from memory
+reg  [NB_WIDTH-1:0] mem_data_in;        // Data to write to memory
+reg                 mem_we;             // Write enable signal
+reg  [NB_ADDR-1:0]  mem_addr;           // Address for memory access
 
 /////////////////////////////////////////////////////////////
 // Memory Instance
@@ -62,7 +65,7 @@ ram_async_single_port #(
 /////////////////////////////////////////////////////////////
 // Data Processing - Read
 /////////////////////////////////////////////////////////////
-always @(negedge i_clk) begin
+always @(posedge i_clk) begin
     o_read_data = 32'b0; // Default output
     if (i_mem_read_CU) begin
         case (i_BHW_CU)
@@ -80,23 +83,24 @@ end
 /////////////////////////////////////////////////////////////
 // Data Processing - Write
 /////////////////////////////////////////////////////////////
-always @(posedge i_clk) begin
-    if (i_reset) begin
-        // Reset logic (optional, depends on memory design)
-    end else if (i_mem_write_CU) begin
+always @(*) begin
+    mem_we   = 1'b0; // Default: No write
+    mem_data_in = 32'b0;
+    mem_addr = i_mem_addr[NB_ADDR-1:0];
+
+    if (i_mem_write_CU) begin
         case (i_BHW_CU)
             3'b000: begin // SB
-                u_ram.memory[i_mem_addr[NB_ADDR-1:0]] <= i_mem_data[7:0];
+                mem_we       = 1'b1;
+                mem_data_in  = {24'b0, i_mem_data[7:0]};
             end
             3'b001: begin // SH
-                u_ram.memory[i_mem_addr[NB_ADDR-1:0]]     <= i_mem_data[15:8];
-                u_ram.memory[i_mem_addr[NB_ADDR-1:0]+1]  <= i_mem_data[7:0];
+                mem_we       = 1'b1;
+                mem_data_in  = {16'b0, i_mem_data[15:0]};
             end
             3'b011: begin // SW
-                u_ram.memory[i_mem_addr[NB_ADDR-1:0]]     <= i_mem_data[31:24];
-                u_ram.memory[i_mem_addr[NB_ADDR-1:0]+1]  <= i_mem_data[23:16];
-                u_ram.memory[i_mem_addr[NB_ADDR-1:0]+2]  <= i_mem_data[15:8];
-                u_ram.memory[i_mem_addr[NB_ADDR-1:0]+3]  <= i_mem_data[7:0];
+                mem_we       = 1'b1;
+                mem_data_in  = i_mem_data;
             end
         endcase
     end
