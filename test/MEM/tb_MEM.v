@@ -97,7 +97,7 @@ initial begin
     // Test 4: Store Byte (SB)
     @(posedge clk);
     mem_addr    = 9'h011; // Address 0x11
-    mem_data    = 32'h000000AB; // Write 0xAB to byte
+    mem_data    = 32'h0000FFAB; // Write 0xAB to byte
     mem_write_CU = 1;
     BHW_CU      = 3'b000; // SB
     @(posedge clk);
@@ -109,10 +109,10 @@ initial begin
     BHW_CU      = 3'b000; // LB
     @(posedge clk);
     mem_read_CU = 0;
-    if (read_data[7:0] !== 8'hAB)
-        $display("Test LB Failed: Expected 0xAB, Got 0x%h", read_data[7:0]);
+    if (read_data !== 8'hAB)
+        $display("Test LB Failed: Expected 0xAB, Got 0x%h", read_data);
     else
-        $display("Test LB Passed: Read 0x%h", read_data[7:0]);
+        $display("Test LB Passed: Read 0x%h", read_data);
 
     // Test 6: Load Byte Unsigned (LBU)
     @(posedge clk);
@@ -120,15 +120,15 @@ initial begin
     BHW_CU      = 3'b100; // LBU
     @(posedge clk);
     mem_read_CU = 0;
-    if (read_data[7:0] !== 8'hAB)
-        $display("Test LBU Failed: Expected 0xAB, Got 0x%h", read_data[7:0]);
+    if (read_data !== 8'hAB)
+        $display("Test LBU Failed: Expected 0xAB, Got 0x%h", read_data);
     else
-        $display("Test LBU Passed: Read 0x%h", read_data[7:0]);
+        $display("Test LBU Passed: Read 0x%h", read_data);
 
     // Test 7: Store Halfword (SH)
     @(posedge clk);
     mem_addr    = 9'h012; // Address 0x12
-    mem_data    = 32'h0000CDEF; // Write 0xCDEF
+    mem_data    = 32'hFFFFCDEF; // Write 0xCDEF
     mem_write_CU = 1;
     BHW_CU      = 3'b001; // SH
     @(posedge clk);
@@ -140,10 +140,10 @@ initial begin
     BHW_CU      = 3'b001; // LH
     @(posedge clk);
     mem_read_CU = 0;
-    if (read_data[15:0] !== 16'hCDEF)
-        $display("Test LH Failed: Expected 0xCDEF, Got 0x%h", read_data[15:0]);
+    if (read_data !== 16'hCDEF)
+        $display("Test LH Failed: Expected 0xCDEF, Got 0x%h", read_data);
     else
-        $display("Test LH Passed: Read 0x%h", read_data[15:0]);
+        $display("Test LH Passed: Read 0x%h", read_data);
 
     // Test 9: Load Halfword Unsigned (LHU)
     @(posedge clk);
@@ -151,10 +151,10 @@ initial begin
     BHW_CU      = 3'b101; // LHU
     @(posedge clk);
     mem_read_CU = 0;
-    if (read_data[15:0] !== 16'hCDEF)
-        $display("Test LHU Failed: Expected 0xCDEF, Got 0x%h", read_data[15:0]);
+    if (read_data !== 16'hCDEF)
+        $display("Test LHU Failed: Expected 0xCDEF, Got 0x%h", read_data);
     else
-        $display("Test LHU Passed: Read 0x%h", read_data[15:0]);
+        $display("Test LHU Passed: Read 0x%h", read_data);
 
     // Test 10: Write at lowest address (0x000)
     @(posedge clk);

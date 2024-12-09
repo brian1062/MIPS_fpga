@@ -43,8 +43,6 @@ module MEM #(
 /////////////////////////////////////////////////////////////
 wire [NB_WIDTH-1:0] mem_data_out;       // Data read from memory
 reg  [NB_WIDTH-1:0] mem_data_in;        // Data to write to memory
-reg                 mem_we;             // Write enable signal
-reg  [NB_ADDR-1:0]  mem_addr;           // Address for memory access
 
 /////////////////////////////////////////////////////////////
 // Memory Instance
@@ -66,7 +64,10 @@ ram_async_single_port #(
 // Data Processing - Read
 /////////////////////////////////////////////////////////////
 always @(posedge i_clk) begin
-    o_read_data = 32'b0; // Default output
+    if (i_reset) begin
+        o_read_data = 32'b0; // Default output
+        mem_data_in = 32'b0;
+    end
     if (i_mem_read_CU) begin
         case (i_BHW_CU)
             3'b000: o_read_data = {{24{mem_data_out[7]}}, mem_data_out[7:0]};  // LB
@@ -78,28 +79,15 @@ always @(posedge i_clk) begin
             default: o_read_data = 32'b0;
         endcase
     end
-end
-
-/////////////////////////////////////////////////////////////
-// Data Processing - Write
-/////////////////////////////////////////////////////////////
-always @(*) begin
-    mem_we   = 1'b0; // Default: No write
-    mem_data_in = 32'b0;
-    mem_addr = i_mem_addr[NB_ADDR-1:0];
-
     if (i_mem_write_CU) begin
         case (i_BHW_CU)
             3'b000: begin // SB
-                mem_we       = 1'b1;
                 mem_data_in  = {24'b0, i_mem_data[7:0]};
             end
             3'b001: begin // SH
-                mem_we       = 1'b1;
                 mem_data_in  = {16'b0, i_mem_data[15:0]};
             end
             3'b011: begin // SW
-                mem_we       = 1'b1;
                 mem_data_in  = i_mem_data;
             end
         endcase
