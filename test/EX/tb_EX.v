@@ -5,6 +5,7 @@ module tb_EX;
     // Parámetros
     parameter NB_REG  = 32;
     parameter NB_ADDR = 5;
+    parameter NB_OP  = 6;
     parameter ALU_OP  = 4;
 
     // Entradas
@@ -19,14 +20,14 @@ module tb_EX;
     reg signed [NB_REG-1:0]   i_inst_sign_extended;
     reg        [NB_REG-1:0]   i_aluResult_WB;
     reg        [NB_REG-1:0]   i_aluResult_MEM;
-    reg        [NB_REG-1:0]   i_op_r_tipe;
+    reg        [NB_OP-1:0]    i_op_r_tipe;
     reg        [1:0]          i_forwardA;
     reg        [1:0]          i_forwardB;
 
     // Salidas
     wire       [NB_REG-1:0]   o_alu_result;
     wire       [NB_ADDR-1:0]  o_write_reg;
-    wire       [NB_REG-1:0]   o_rd_to_WB;
+    wire       [NB_ADDR-1:0]   o_rd_to_WB;
     wire                      o_alu_condition_zero;
 
     // Instancia del módulo

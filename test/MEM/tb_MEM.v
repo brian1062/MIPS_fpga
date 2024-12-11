@@ -1,183 +1,149 @@
-`timescale 1ns/1ps
+`timescale 1ns / 1ps
 
 module tb_MEM;
 
-/////////////////////////////////////////////////////////////
-// Parameters
-/////////////////////////////////////////////////////////////
-localparam NB_WIDTH = 32; // Data width
-localparam NB_ADDR  = 9;  // Address width
-localparam NB_DATA  = 8;  // Memory element width
+    // Parámetros de la memoria
+    parameter NB_WIDTH = 32;
+    parameter NB_ADDR  = 9;
+    parameter NB_DATA  = 8;
 
-/////////////////////////////////////////////////////////////
-// Signals
-/////////////////////////////////////////////////////////////
-reg                   clk;
-reg                   reset;
-reg  [NB_WIDTH-1:0]   mem_addr;
-reg  [NB_WIDTH-1:0]   mem_data;
-reg                   mem_read_CU;
-reg                   mem_write_CU;
-reg  [2:0]            BHW_CU;
-wire [NB_WIDTH-1:0]   read_data;
+    // Entradas y salidas para el DUT
+    reg                   i_clk;
+    reg                   i_reset;
+    reg [NB_WIDTH-1:0]    i_mem_addr;
+    reg [NB_WIDTH-1:0]    i_mem_data;
+    reg                   i_mem_read_CU;
+    reg                   i_mem_write_CU;
+    reg [2:0]             i_BHW_CU;
+    wire [NB_WIDTH-1:0]   o_read_data;
 
-/////////////////////////////////////////////////////////////
-// Module Under Test (MUT)
-/////////////////////////////////////////////////////////////
-MEM #(
-    .NB_WIDTH(NB_WIDTH),
-    .NB_ADDR (NB_ADDR),
-    .NB_DATA (NB_DATA)
-) uut (
-    .i_clk          (clk),
-    .i_reset        (reset),
-    .i_mem_addr     (mem_addr),
-    .i_mem_data     (mem_data),
-    .i_mem_read_CU  (mem_read_CU),
-    .i_mem_write_CU (mem_write_CU),
-    .i_BHW_CU       (BHW_CU),
-    .o_read_data    (read_data)
-);
+    // Instancia del módulo MEM
+    MEM #(
+        .NB_WIDTH(NB_WIDTH),
+        .NB_ADDR(NB_ADDR),
+        .NB_DATA(NB_DATA)
+    ) dut (
+        .i_clk(i_clk),
+        .i_reset(i_reset),
+        .i_mem_addr(i_mem_addr),
+        .i_mem_data(i_mem_data),
+        .i_mem_read_CU(i_mem_read_CU),
+        .i_mem_write_CU(i_mem_write_CU),
+        .i_BHW_CU(i_BHW_CU),
+        .o_read_data(o_read_data)
+    );
 
-/////////////////////////////////////////////////////////////
-// Clock Generation
-/////////////////////////////////////////////////////////////
-always #5 clk = ~clk; // 10ns clock period
+    // Generación del reloj (clock) de 10 ns
+    always #5 i_clk = ~i_clk;
 
-/////////////////////////////////////////////////////////////
-// Test Bench Logic
-/////////////////////////////////////////////////////////////
-initial begin
-    // Initialize signals
-    clk         = 0;
-    reset       = 1;
-    mem_addr    = 0;
-    mem_data    = 0;
-    mem_read_CU = 0;
-    mem_write_CU = 0;
-    BHW_CU      = 0;
+    // Proceso de simulación
+    initial begin
+        // Inicialización de señales
+        i_clk = 0;
+        i_reset = 0;
+        i_mem_addr = 0;
+        i_mem_data = 0;
+        i_mem_read_CU = 0;
+        i_mem_write_CU = 0;
+        i_BHW_CU = 3'b000;
 
-    // Reset the module
-    #10 reset = 0;
+        // Reset de la memoria
+        #10 i_reset = 1;
+        #10 i_reset = 0;
 
-    // Test Case: Write and Read Operations
-    // -----------------------------------------------------
+        // Escribir datos con diferentes operaciones
+        // SB (escritura de 1 byte)
+        #10 i_mem_write_CU = 1;
+        i_mem_addr = 4;
+        i_mem_data = 32'h000000FF; // Escribe 0xFF en la dirección 4
+        i_BHW_CU = 3'b000; // SB
+        #10 i_mem_write_CU = 0;
 
-    // Test 1: Store Word (SW)
-    @(posedge clk);
-    mem_addr    = 9'h010; // Address 0x10
-    mem_data    = 32'h12345678;
-    mem_write_CU = 1;
-    BHW_CU      = 3'b011; // SW
-    @(posedge clk);
-    mem_write_CU = 0;
+        // Verificación de la lectura de SB
+        #10 i_mem_read_CU = 1;
+        i_mem_addr = 4;
+        i_BHW_CU = 3'b000; // LB
+        #10 i_mem_read_CU = 0;
+        if (o_read_data == 32'hFFFFFF00) begin
+            $display("Test de SB y LB exitoso. Valor leido: %h", o_read_data);
+        end else begin
+            $display("Error en test de SB y LB. Valor leido: %h", o_read_data);
+        end
 
-    // Test 2: Load Word (LW) - Lectura en el flanco negativo
-    @(posedge clk); // Lectura en el flanco negativo
-    mem_read_CU = 1;
-    BHW_CU      = 3'b011; // LW
-    @(posedge clk); // Lectura completada
-    mem_read_CU = 0;
-    if (read_data !== 32'h12345678)
-        $display("Test LW Failed: Expected 0x12345678, Got 0x%h", read_data);
-    else
-        $display("Test LW Passed: Read 0x%h", read_data);
+        // SH (escritura de 2 bytes)
+        #10 i_mem_write_CU = 1;
+        i_mem_addr = 8;
+        i_mem_data = 32'h0000A5A5; // Escribe 0xA5A5 en la dirección 8
+        i_BHW_CU = 3'b001; // SH
+        #10 i_mem_write_CU = 0;
 
-    // Test 3: Load Word Unsigned (LWU)
-    @(posedge clk);
-    mem_read_CU = 1;
-    BHW_CU      = 3'b111; // SLWU
-    @(posedge clk);
-    mem_read_CU = 0;
-    if (read_data !== 32'h12345678)
-        $display("Test LWU Failed: Expected 0x12345678, Got 0x%h", read_data);
-    else
-        $display("Test LWU Passed: Read 0x%h", read_data);
+        // Verificación de la lectura de SH
+        #10 i_mem_read_CU = 1;
+        i_mem_addr = 8;
+        i_BHW_CU = 3'b001; // LH
+        #10 i_mem_read_CU = 0;
+        if (o_read_data == 32'hFFFFA5A5) begin
+            $display("Test de SH y LH exitoso. Valor leido: %h", o_read_data);
+        end else begin
+            $display("Error en test de SH y LH. Valor leido: %h", o_read_data);
+        end
 
-    // Test 4: Store Byte (SB)
-    @(posedge clk);
-    mem_addr    = 9'h011; // Address 0x11
-    mem_data    = 32'h0000FFAB; // Write 0xAB to byte
-    mem_write_CU = 1;
-    BHW_CU      = 3'b000; // SB
-    @(posedge clk);
-    mem_write_CU = 0;
+        // SW (escritura de 4 bytes)
+        #10 i_mem_write_CU = 1;
+        i_mem_addr = 12;
+        i_mem_data = 32'hDEADBEEF; // Escribe 0xDEADBEEF en la dirección 12
+        i_BHW_CU = 3'b011; // SW
+        #10 i_mem_write_CU = 0;
 
-    // Test 5: Load Byte (LB)
-    @(posedge clk);
-    mem_read_CU = 1;
-    BHW_CU      = 3'b000; // LB
-    @(posedge clk);
-    mem_read_CU = 0;
-    if (read_data !== 8'hAB)
-        $display("Test LB Failed: Expected 0xAB, Got 0x%h", read_data);
-    else
-        $display("Test LB Passed: Read 0x%h", read_data);
+        // Verificación de la lectura de SW
+        #10 i_mem_read_CU = 1;
+        i_mem_addr = 12;
+        i_BHW_CU = 3'b011; // LW
+        #10 i_mem_read_CU = 0;
+        if (o_read_data == 32'hDEADBEEF) begin
+            $display("Test de SW y LW exitoso. Valor leido: %h", o_read_data);
+        end else begin
+            $display("Error en test de SW y LW. Valor leido: %h", o_read_data);
+        end
 
-    // Test 6: Load Byte Unsigned (LBU)
-    @(posedge clk);
-    mem_read_CU = 1;
-    BHW_CU      = 3'b100; // LBU
-    @(posedge clk);
-    mem_read_CU = 0;
-    if (read_data !== 8'hAB)
-        $display("Test LBU Failed: Expected 0xAB, Got 0x%h", read_data);
-    else
-        $display("Test LBU Passed: Read 0x%h", read_data);
+        // LBU (lectura de byte sin signo)
+        #10 i_mem_addr = 16;
+        i_mem_data = 32'h00FF0000; // Escribe 0xFF en la dirección 16
+        i_mem_write_CU = 1;
+        i_BHW_CU = 3'b100; // SB
+        #10 i_mem_write_CU = 0;
 
-    // Test 7: Store Halfword (SH)
-    @(posedge clk);
-    mem_addr    = 9'h012; // Address 0x12
-    mem_data    = 32'hFFFFCDEF; // Write 0xCDEF
-    mem_write_CU = 1;
-    BHW_CU      = 3'b001; // SH
-    @(posedge clk);
-    mem_write_CU = 0;
+        // Verificación de LBU
+        #10 i_mem_read_CU = 1;
+        i_mem_addr = 16;
+        i_BHW_CU = 3'b100; // LBU
+        #10 i_mem_read_CU = 0;
+        if (o_read_data == 32'h000000FF) begin
+            $display("Test de LBU exitoso. Valor leido: %h", o_read_data);
+        end else begin
+            $display("Error en test de LBU. Valor leido: %h", o_read_data);
+        end
 
-    // Test 8: Load Halfword (LH)
-    @(posedge clk);
-    mem_read_CU = 1;
-    BHW_CU      = 3'b001; // LH
-    @(posedge clk);
-    mem_read_CU = 0;
-    if (read_data !== 16'hCDEF)
-        $display("Test LH Failed: Expected 0xCDEF, Got 0x%h", read_data);
-    else
-        $display("Test LH Passed: Read 0x%h", read_data);
+        // LHU (lectura de halfword sin signo)
+        #10 i_mem_addr = 20;
+        i_mem_data = 32'h00FF0000; // Escribe 0xFF00 en la dirección 20
+        i_mem_write_CU = 1;
+        i_BHW_CU = 3'b101; // SH
+        #10 i_mem_write_CU = 0;
 
-    // Test 9: Load Halfword Unsigned (LHU)
-    @(posedge clk);
-    mem_read_CU = 1;
-    BHW_CU      = 3'b101; // LHU
-    @(posedge clk);
-    mem_read_CU = 0;
-    if (read_data !== 16'hCDEF)
-        $display("Test LHU Failed: Expected 0xCDEF, Got 0x%h", read_data);
-    else
-        $display("Test LHU Passed: Read 0x%h", read_data);
+        // Verificación de LHU
+        #10 i_mem_read_CU = 1;
+        i_mem_addr = 20;
+        i_BHW_CU = 3'b101; // LHU
+        #10 i_mem_read_CU = 0;
+        if (o_read_data == 32'h0000FF00) begin
+            $display("Test de LHU exitoso. Valor leido: %h", o_read_data);
+        end else begin
+            $display("Error en test de LHU. Valor leido: %h", o_read_data);
+        end
 
-    // Test 10: Write at lowest address (0x000)
-    @(posedge clk);
-    mem_addr    = 9'h000; // Address 0x000
-    mem_data    = 32'h00000001; // Write data
-    mem_write_CU = 1;
-    BHW_CU      = 3'b011; // SW
-    @(posedge clk);
-    mem_write_CU = 0;
-
-    // Test 11: Read from lowest address (0x000)
-    @(posedge clk); // Lectura en flanco negativo
-    mem_read_CU = 1;
-    BHW_CU      = 3'b011; // LW
-    @(posedge clk);
-    mem_read_CU = 0;
-    if (read_data !== 32'h00000001)
-        $display("Test Read Lowest Address Failed: Expected 0x00000001, Got 0x%h", read_data);
-    else
-        $display("Test Read Lowest Address Passed: Read 0x%h", read_data);
-
-    ///////////////////////////////////////////////////////////////
-    $finish;
-end
+        // Finalización de la simulación
+        #10 $finish;
+    end
 
 endmodule

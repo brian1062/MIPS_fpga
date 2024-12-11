@@ -42,6 +42,7 @@ module MEM #(
 // Internal Signals
 /////////////////////////////////////////////////////////////
 wire [NB_WIDTH-1:0] mem_data_out;       // Data read from memory
+wire [NB_WIDTH-1:0] data_to_mem;
 reg  [NB_WIDTH-1:0] mem_data_in;        // Data to write to memory
 
 /////////////////////////////////////////////////////////////
@@ -56,7 +57,7 @@ ram_async_single_port #(
     .i_reset   (i_reset),
     .i_we      (i_mem_write_CU),
     .i_addr    (i_mem_addr[NB_ADDR-1:0]),
-    .i_data_in (i_mem_data),
+    .i_data_in (data_to_mem),
     .o_data_out(mem_data_out)
 );
 
@@ -65,33 +66,37 @@ ram_async_single_port #(
 /////////////////////////////////////////////////////////////
 always @(posedge i_clk) begin
     if (i_reset) begin
-        o_read_data = 32'b0; // Default output
-        mem_data_in = 32'b0;
+        o_read_data <= 32'b0; // Default output
+        mem_data_in <= 32'b0;
     end
-    if (i_mem_read_CU) begin
-        case (i_BHW_CU)
-            3'b000: o_read_data = {{24{mem_data_out[7]}}, mem_data_out[7:0]};  // LB
-            3'b001: o_read_data = {{16{mem_data_out[15]}}, mem_data_out[15:0]}; // LH
-            3'b011: o_read_data = mem_data_out;                                // LW
-            3'b100: o_read_data = {24'b0, mem_data_out[7:0]};                  // LBU
-            3'b101: o_read_data = {16'b0, mem_data_out[15:0]};                 // LHU
-            3'b111: o_read_data = {24'b0, mem_data_out[31:0]};                 // LWU
-            default: o_read_data = 32'b0;
-        endcase
-    end
-    if (i_mem_write_CU) begin
-        case (i_BHW_CU)
-            3'b000: begin // SB
-                mem_data_in  = {24'b0, i_mem_data[7:0]};
-            end
-            3'b001: begin // SH
-                mem_data_in  = {16'b0, i_mem_data[15:0]};
-            end
-            3'b011: begin // SW
-                mem_data_in  = i_mem_data;
-            end
-        endcase
-    end
+
+    case (i_BHW_CU)
+            3'b000: o_read_data <= {{24{mem_data_out[7]}}, mem_data_out[7:0]};  // LB
+            3'b001: o_read_data <= {{16{mem_data_out[15]}}, mem_data_out[15:0]}; // LH
+            3'b011: o_read_data <= mem_data_out;                                // LW
+            3'b100: o_read_data <= {24'h000000, mem_data_out[7:0]};             // LBU
+            3'b101: o_read_data <= {16'h0000, mem_data_out[15:0]};             // LHU
+            default: o_read_data <= mem_data_out[31:0];
+    endcase
+end
+always @(*) begin
+
+    case (i_BHW_CU)
+        3'b000: begin // SB
+            mem_data_in  = {24'b0, i_mem_data[7:0]};
+        end
+        3'b001: begin // SH
+            mem_data_in  = {16'b0, i_mem_data[15:0]};
+        end
+        3'b011: begin // SW
+            mem_data_in  = i_mem_data;
+        end
+        default: mem_data_in = i_mem_data;
+    endcase
+
 end
 
+assign data_to_mem = mem_data_in;
+
 endmodule
+

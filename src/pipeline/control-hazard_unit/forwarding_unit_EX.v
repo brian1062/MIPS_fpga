@@ -24,7 +24,7 @@ module forwarding_unit_EX #(
     parameter NB_REG = 5 // Register identifier width
 ) (
     // Inputs
-    input [NB_REG-1:0] i_rd_from_ID,       // Source register 1 from ID stage
+    input [NB_REG-1:0] i_rs_from_ID,       // Source register 1 from ID stage
     input [NB_REG-1:0] i_rt_from_ID,       // Source register 2 from ID stage
     input [NB_REG-1:0] i_rd_from_M,        // Destination register from EX/M stage
     input [NB_REG-1:0] i_rd_from_WB,       // Destination register from M/WB stage
@@ -41,22 +41,33 @@ module forwarding_unit_EX #(
 /////////////////////////////////////////////////////////////
 
 always @(*) begin
-    // Default values: no forwarding
-    o_forwardA = 2'b00;
-    o_forwardB = 2'b00;
 
     // Forwarding for o_forwardA
-    if (i_RegWrite_from_M && (i_rd_from_M != 0) && (i_rd_from_M == i_rd_from_ID)) begin
+    if (i_RegWrite_from_M && (i_rd_from_M != 0) && (i_rd_from_M == i_rs_from_ID)) 
+    begin
         o_forwardA = 2'b10; // Forward from EX/M stage
-    end else if (i_RegWrite_from_WB && (i_rd_from_WB != 0) && (i_rd_from_WB == i_rd_from_ID)) begin
+    end 
+    else if (i_RegWrite_from_WB && (i_rd_from_WB != 0) && (i_rd_from_WB == i_rs_from_ID)) 
+    begin
         o_forwardA = 2'b01; // Forward from M/WB stage
+    end
+    else 
+    begin
+        o_forwardA = 2'b00;
     end
 
     // Forwarding for o_forwardB
-    if (i_RegWrite_from_M && (i_rd_from_M != 0) && (i_rd_from_M == i_rt_from_ID)) begin
+    if (i_RegWrite_from_M && (i_rd_from_M != 0) && (i_rd_from_M == i_rt_from_ID)) 
+    begin
         o_forwardB = 2'b10; // Forward from EX/M stage
-    end else if (i_RegWrite_from_WB && (i_rd_from_WB != 0) && (i_rd_from_WB == i_rt_from_ID)) begin
+    end 
+    else if (i_RegWrite_from_WB && (i_rd_from_WB != 0) && (i_rd_from_WB == i_rt_from_ID)) 
+    begin
         o_forwardB = 2'b01; // Forward from M/WB stage
+    end
+    else
+    begin
+        o_forwardB = 2'b00;
     end
 end
 

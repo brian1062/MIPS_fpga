@@ -25,7 +25,7 @@ module ALU #(
     // Inputs
     input      [NB_INPUT-1:0] alu_input_A,             // First operand
     input      [NB_INPUT-1:0] alu_input_B,             // Second operand
-    input      [NB_CONTROL-1:0] o_alu_control_signals, // ALU control signals
+    input      [NB_CONTROL-1:0] i_alu_control_signals, // ALU control signals
 
     // Outputs
     output reg [NB_INPUT-1:0] o_alu_result,        // ALU result
@@ -37,7 +37,7 @@ module ALU #(
 /////////////////////////////////////////////////////////////
 
 always @(*) begin
-    case (o_alu_control_signals)
+    case (i_alu_control_signals)
         6'b100000: o_alu_result = $signed(alu_input_A) + $signed(alu_input_B);  // ADD
         6'b100001: o_alu_result = alu_input_A + alu_input_B;  // ADDU (unsigned add)
         6'b100010: o_alu_result = $signed(alu_input_A) - $signed(alu_input_B);  // SUB
