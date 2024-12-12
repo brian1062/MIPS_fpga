@@ -45,7 +45,7 @@ module IF
     input                   i_reset,        // Reset signal
     input                   i_dunit_clk_en, // Clock enable signal for data unit
     input                   i_dunit_w_en,   // Write enable signal for data unit
-    input  [NB_WIDHT-1:0]   i_dunit_addr,   // Address input for data unit
+    input  [NB_REG-1:0]   i_dunit_addr,   // Address input for data unit
     input                   i_PCSrc,        // Selector for PC source
     input                   i_Jump,         // Jump signal
     input                   i_JSel,         // Selector for jump address
@@ -63,6 +63,7 @@ wire [NB_REG-1:0] pc_to_mem;        // Current PC value for memory
 wire [NB_REG-1:0] mpx3_to_pc;       // Output of third multiplexer to PC
 wire [NB_REG-1:0] mpx2_to_mpx3;     // Output of second multiplexer
 wire [NB_REG-1:0] mpx1_to_mpx2;     // Output of first multiplexer
+wire [NB_REG-1:0] instr_addr;
 
 
 // First multiplexer: Selects between PC+4 and immediate value
@@ -113,7 +114,7 @@ adder_four #(
     .ADDER_WIDTH(NB_REG) 
 ) u_adder_four (
     .a_input     (pc_to_mem         ),
-    .sum         (o_pcplus4          )
+    .sum         (o_pcplus4         )
 );
 
 // Instruction memory (asynchronous RAM)
@@ -125,9 +126,11 @@ ram_async_single_port #(
       .i_clk       (i_clk       ),
       .i_reset     (i_reset     ),
       .i_we        (i_dunit_w_en),
-      .i_addr      (pc_to_mem[NB_WIDHT-1:0] ),
+      .i_addr      (instr_addr[NB_WIDHT-1:0] ),
       .i_data_in   (i_dunit_data),
       .o_data_out  (o_instruction)
-  );  
+  );
+
+assign instr_addr = i_dunit_w_en ? i_dunit_addr : pc_to_mem;
     
 endmodule
