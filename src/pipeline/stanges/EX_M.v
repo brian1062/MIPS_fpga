@@ -48,7 +48,7 @@ always @(posedge i_clk) begin
         w_data_reg   <= i_w_data;
         data_addr_reg    <= i_data_addr;
 
-        control_reg  <= i_control_unit;
+        control_reg  <= i_control_from_ex;
 
 
         
@@ -71,7 +71,7 @@ assign o_alu_result     = alu_es_reg;
 assign o_w_data         = w_data_reg;
 assign o_data_addr      = data_addr_reg;
 
-assign o_control_unit   = control_reg;
+assign o_control_from_ex   = control_reg;
 
     
 endmodule

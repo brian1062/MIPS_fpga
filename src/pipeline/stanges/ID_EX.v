@@ -28,7 +28,7 @@ reg [NB_CTRL-1:0] control_reg;
 reg signed [NB_REG-1:0] sign_ext_reg;
 
 always @(posedge i_clk) begin
-    if (i_reset || i_flush) begin
+    if (i_reset ) begin
         pc_reg <= 32'b0;
         rs_reg       <= 32'b0;
         rt_reg       <= 32'b0;
