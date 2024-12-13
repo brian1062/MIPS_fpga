@@ -24,18 +24,18 @@
 /////////////////////////////////////////////////////////////
 
 module MEM #(
-    parameter NB_WIDTH = 32,    // Data width
-    parameter NB_ADDR  = 9,     // Address width
-    parameter NB_DATA  = 8      // Memory element width
+    parameter NB_WIDTH = 32 ,    // Data width
+    parameter NB_ADDR  = 9  ,     // Address width
+    parameter NB_DATA  = 8        // Memory element width
 )(
-    input                   i_clk,            // Clock signal
-    input                   i_reset,          // Reset signal
-    input  [NB_WIDTH-1:0]   i_mem_addr,       // Address for memory access
-    input  [NB_WIDTH-1:0]   i_mem_data,       // Data to write
-    input                   i_mem_read_CU,    // Read enable
-    input                   i_mem_write_CU,   // Write enable
-    input  [2:0]            i_BHW_CU,         // Byte/halfword/word control signal
-    output reg [NB_WIDTH-1:0] o_read_data     // Data read
+    input                   i_clk           ,            // Clock signal
+    input                   i_reset         ,          // Reset signal
+    input  [NB_WIDTH-1:0]   i_mem_addr      ,       // Address for memory access
+    input  [NB_WIDTH-1:0]   i_mem_data      ,       // Data to write
+    input                   i_mem_read_CU   ,    // Read enable
+    input                   i_mem_write_CU  ,   // Write enable
+    input  [2:0]            i_BHW_CU        ,         // Byte/halfword/word control signal
+    output [NB_WIDTH-1:0] o_read_data            // Data read
 );
 
 /////////////////////////////////////////////////////////////
@@ -44,6 +44,7 @@ module MEM #(
 wire [NB_WIDTH-1:0] mem_data_out;       // Data read from memory
 wire [NB_WIDTH-1:0] data_to_mem;
 reg  [NB_WIDTH-1:0] mem_data_in;        // Data to write to memory
+reg  [NB_WIDTH-1:0] read_data  ;
 
 /////////////////////////////////////////////////////////////
 // Memory Instance
@@ -66,17 +67,17 @@ ram_async_single_port #(
 /////////////////////////////////////////////////////////////
 always @(posedge i_clk) begin
     if (i_reset) begin
-        o_read_data <= 32'b0; // Default output
+        read_data <= 32'b0; // Default output
         mem_data_in <= 32'b0;
     end
 
     case (i_BHW_CU)
-            3'b000: o_read_data <= {{24{mem_data_out[7]}}, mem_data_out[7:0]};  // LB
-            3'b001: o_read_data <= {{16{mem_data_out[15]}}, mem_data_out[15:0]}; // LH
-            3'b011: o_read_data <= mem_data_out;                                // LW
-            3'b100: o_read_data <= {24'h000000, mem_data_out[7:0]};             // LBU
-            3'b101: o_read_data <= {16'h0000, mem_data_out[15:0]};             // LHU
-            default: o_read_data <= mem_data_out[31:0];
+            3'b000: read_data <= {{24{mem_data_out[7]}}, mem_data_out[7:0]};  // LB
+            3'b001: read_data <= {{16{mem_data_out[15]}}, mem_data_out[15:0]}; // LH
+            3'b011: read_data <= mem_data_out;                                // LW
+            3'b100: read_data <= {24'h000000, mem_data_out[7:0]};             // LBU
+            3'b101: read_data <= {16'h0000, mem_data_out[15:0]};             // LHU
+            default: read_data <= mem_data_out[31:0];
     endcase
 end
 always @(*) begin
@@ -97,6 +98,7 @@ always @(*) begin
 end
 
 assign data_to_mem = mem_data_in;
+assign o_read_data = read_data;
 
 endmodule
 

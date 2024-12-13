@@ -6,7 +6,7 @@ module tb_forwarding_unit_EX;
     parameter NB_REG = 5;
 
     // Entradas
-    reg [NB_REG-1:0] i_rd_from_ID;       // Source register 1 from ID stage
+    reg [NB_REG-1:0] i_rs_from_ID;       // Source register 1 from ID stage
     reg [NB_REG-1:0] i_rt_from_ID;       // Source register 2 from ID stage
     reg [NB_REG-1:0] i_rd_from_M;        // Destination register from EX/M stage
     reg [NB_REG-1:0] i_rd_from_WB;       // Destination register from M/WB stage
@@ -21,7 +21,7 @@ module tb_forwarding_unit_EX;
     forwarding_unit_EX #(
         .NB_REG(NB_REG)
     ) u_forwarding_unit_EX (
-        .i_rd_from_ID(i_rd_from_ID),
+        .i_rs_from_ID(i_rs_from_ID),
         .i_rt_from_ID(i_rt_from_ID),
         .i_rd_from_M(i_rd_from_M),
         .i_rd_from_WB(i_rd_from_WB),
@@ -37,7 +37,7 @@ module tb_forwarding_unit_EX;
         $display("-----------------------------------------------------------------------------");
 
         // Caso 1: No hay forwarding
-        i_rd_from_ID = 5'b00001;
+        i_rs_from_ID = 5'b00001;
         i_rt_from_ID = 5'b00010;
         i_rd_from_M = 5'b00011;
         i_rd_from_WB = 5'b00100;
@@ -46,10 +46,10 @@ module tb_forwarding_unit_EX;
         #10;
         $display("%0dns\t%b\t\t%b\t\t%b\t%b\t%b\t%b\t%b\t\t%b",
                   $time, i_RegWrite_from_M, i_RegWrite_from_WB, i_rd_from_M, i_rd_from_WB, 
-                  i_rd_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
+                  i_rs_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
 
         // Caso 2: Forwarding desde EX/M para RS
-        i_rd_from_ID = 5'b00011;
+        i_rs_from_ID = 5'b00011;
         i_rt_from_ID = 5'b00010;
         i_rd_from_M = 5'b00011;
         i_rd_from_WB = 5'b00100;
@@ -58,10 +58,10 @@ module tb_forwarding_unit_EX;
         #10;
         $display("%0dns\t%b\t\t%b\t\t%b\t%b\t%b\t%b\t%b\t\t%b",
                   $time, i_RegWrite_from_M, i_RegWrite_from_WB, i_rd_from_M, i_rd_from_WB, 
-                  i_rd_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
+                  i_rs_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
 
         // Caso 3: Forwarding desde M/WB para RT
-        i_rd_from_ID = 5'b00001;
+        i_rs_from_ID = 5'b00001;
         i_rt_from_ID = 5'b00100;
         i_rd_from_M = 5'b00011;
         i_rd_from_WB = 5'b00100;
@@ -70,10 +70,10 @@ module tb_forwarding_unit_EX;
         #10;
         $display("%0dns\t%b\t\t%b\t\t%b\t%b\t%b\t%b\t%b\t\t%b",
                   $time, i_RegWrite_from_M, i_RegWrite_from_WB, i_rd_from_M, i_rd_from_WB, 
-                  i_rd_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
+                  i_rs_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
 
         // Caso 4: Forwarding para ambos RS y RT
-        i_rd_from_ID = 5'b00100;
+        i_rs_from_ID = 5'b00100;
         i_rt_from_ID = 5'b00100;
         i_rd_from_M = 5'b00100;
         i_rd_from_WB = 5'b00100;
@@ -82,10 +82,10 @@ module tb_forwarding_unit_EX;
         #10;
         $display("%0dns\t%b\t\t%b\t\t%b\t%b\t%b\t%b\t%b\t\t%b",
                   $time, i_RegWrite_from_M, i_RegWrite_from_WB, i_rd_from_M, i_rd_from_WB, 
-                  i_rd_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
+                  i_rs_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
 
         // Caso 5: Sin coincidencias pero RegWrite activado
-        i_rd_from_ID = 5'b00001;
+        i_rs_from_ID = 5'b00001;
         i_rt_from_ID = 5'b00010;
         i_rd_from_M = 5'b00101;
         i_rd_from_WB = 5'b00110;
@@ -94,7 +94,7 @@ module tb_forwarding_unit_EX;
         #10;
         $display("%0dns\t%b\t\t%b\t\t%b\t%b\t%b\t%b\t%b\t\t%b",
                   $time, i_RegWrite_from_M, i_RegWrite_from_WB, i_rd_from_M, i_rd_from_WB, 
-                  i_rd_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
+                  i_rs_from_ID, i_rt_from_ID, o_forwardA, o_forwardB);
 
         $stop;
     end

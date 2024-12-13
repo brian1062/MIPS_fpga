@@ -1,5 +1,4 @@
 module hazard_unit 
-#()
 (
     input  i_jump       ,
     input  i_branch     ,
