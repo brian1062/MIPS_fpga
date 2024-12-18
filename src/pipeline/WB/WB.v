@@ -31,12 +31,12 @@ module WB
 #(
     parameter               NB_REG  = 32 // Default width of registers and data buses
 )(
-    input [NB_REG-1:0]      i_alu_result,      // ALU result
-    input [NB_REG-1:0]      i_data_from_mem,   // Data from memory (ReadData)
-    input [NB_REG-1:0]      i_pcplus8,         // PC+8 value (used for JAL)
-    input                   i_MemToReg,        // MemToReg control signal
-    input                   i_isJal,           // JAL control signal
-    output [NB_REG-1:0]     o_data_to_reg      // Data to be written to register file
+    input [NB_REG-1:0]      i_alu_result    ,      // ALU result
+    input [NB_REG-1:0]      i_data_from_mem ,   // Data from memory (ReadData)
+    input [NB_REG-1:0]      i_pcplus8       ,         // PC+8 value (used for JAL)
+    input                   i_MemToReg      ,        // MemToReg control signal
+    input                   i_isJal         ,           // JAL control signal
+    output [NB_REG-1:0]     o_data_to_reg        // Data to be written to register file
 );
 
 // Internal wire connecting the output of the first multiplexer to the input of the second

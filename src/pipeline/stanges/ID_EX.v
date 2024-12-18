@@ -1,7 +1,7 @@
 module ID_EX 
 #(
     parameter NB_REG = 32,
-    parameter NB_CTRL= 18, //ver bien
+    parameter NB_CTRL= 16, //ver bien
     parameter NB_ADDR = 5
 ) (
     input                           i_clk     ,
@@ -33,7 +33,7 @@ always @(posedge i_clk) begin
         rs_reg       <= 32'b0;
         rt_reg       <= 32'b0;
         sign_ext_reg <= 32'b0;
-        control_reg  <= 18'b0;
+        control_reg  <= 16'b0;
     end
     else if (i_dunit_clk_en) begin
         pc_reg       <= i_pc_eight;
