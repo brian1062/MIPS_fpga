@@ -57,9 +57,8 @@ module EX #(
 
     // Outputs
     output       [NB_REG-1:0]   o_alu_result        , // ALU operation result
-    output       [NB_ADDR-1:0]  o_write_reg         , // Destination register address
-    output       [NB_ADDR-1:0]   o_rd_to_WB          , // RD data for WB
-    output                      o_alu_condition_zero // ALU condition zero flag
+    output       [NB_REG-1:0]   o_write_reg         , // Destination register address
+    output       [NB_ADDR-1:0]  o_rd_to_WB           // RD data for WB
 );
 
 /////////////////////////////////////////////////////////////
@@ -123,8 +122,7 @@ ALU #(
     .alu_input_A           (alu_input_A          ),
     .alu_input_B           (alu_input_B          ),
     .i_alu_control_signals (alu_control_signals  ),
-    .o_alu_result          (o_alu_result         ),
-    .o_alu_condition_zero   (o_alu_condition_zero)
+    .o_alu_result          (o_alu_result         )
 );
 
 /////////////////////////////////////////////////////////////

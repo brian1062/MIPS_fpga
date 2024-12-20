@@ -63,7 +63,7 @@ module ID #(
     output        [NB_REG-1:0] o_pcplus8           , // PC + 8 (used in some jumps).
     output signed [NB_REG-1:0] o_inst_sign_extended, // Sign-extended immediate value.
     output        [NB_REG-1:0] o_rs_data           , // Operand data for RS.
-    output        [NB_ADDR-1:0]o_op_r_tipe         , // Opcode or instruction type.
+    output        [6-1:0]o_op_r_tipe         , // Opcode or instruction type.
     output        [NB_ADDR-1:0]o_rs_addr           , // RS register address.
     output        [NB_ADDR-1:0]o_rt_addr           , // RT register address.
     output        [NB_ADDR-1:0]o_rd_addr           , // RD register address.

@@ -28,8 +28,7 @@ module ALU #(
     input      [NB_CONTROL-1:0] i_alu_control_signals, // ALU control signals
 
     // Outputs
-    output reg [NB_INPUT-1:0] o_alu_result,        // ALU result
-    output reg               o_alu_condition_zero  // Zero condition flag
+    output reg [NB_INPUT-1:0] o_alu_result        // ALU result
 );
 
 /////////////////////////////////////////////////////////////
@@ -54,8 +53,6 @@ always @(*) begin
         default: o_alu_result = 0; // Default case (should never occur)
     endcase
 
-    // Check if the result is zero
-    o_alu_condition_zero = (o_alu_result == 0) ? 1 : 0;
 end
 
 endmodule
