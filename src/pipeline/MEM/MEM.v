@@ -68,7 +68,6 @@ ram_async_single_port #(
 always @(posedge i_clk) begin
     if (i_reset) begin
         read_data <= 32'b0; // Default output
-        mem_data_in <= 32'b0;
     end
 
     case (i_BHW_CU)
@@ -80,20 +79,26 @@ always @(posedge i_clk) begin
             default: read_data <= mem_data_out[31:0];
     endcase
 end
-always @(*) begin
 
-    case (i_BHW_CU)
-        3'b000: begin // SB
-            mem_data_in  = {24'b0, i_mem_data[7:0]};
-        end
-        3'b001: begin // SH
-            mem_data_in  = {16'b0, i_mem_data[15:0]};
-        end
-        3'b011: begin // SW
-            mem_data_in  = i_mem_data;
-        end
-        default: mem_data_in = i_mem_data;
-    endcase
+always @(*) begin
+    if (i_reset) begin
+        mem_data_in <= 32'b0;
+    end
+
+    // if(i_mem_write_CU) begin
+        case (i_BHW_CU)
+            3'b000: begin // SB
+                mem_data_in  <= {24'b0, i_mem_data[7:0]};
+            end
+            3'b001: begin // SH
+                mem_data_in  <= {16'b0, i_mem_data[15:0]};
+            end
+            3'b011: begin // SW
+                mem_data_in  <= i_mem_data;
+            end
+            default: mem_data_in <= i_mem_data;
+        endcase
+    // end
 
 end
 

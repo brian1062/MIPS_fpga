@@ -50,6 +50,7 @@ module IF
     input                   i_Jump,         // Jump signal
     input                   i_JSel,         // Selector for jump address
     input                   i_PCWrite,      // Write enable for PC
+    input                   i_dunit_reset_pc,
     input  [NB_REG-1:0]     i_inmed,        // Immediate value for jump/branch
     input  [NB_INST-1:0]    i_inst_to_mxp,  // Instruction bits for concatenation
     input  [NB_REG-1:0]     i_pc_jsel,      // PC value for jump select
@@ -63,7 +64,7 @@ wire [NB_REG-1:0] pc_to_mem;        // Current PC value for memory
 wire [NB_REG-1:0] mpx3_to_pc;       // Output of third multiplexer to PC
 wire [NB_REG-1:0] mpx2_to_mpx3;     // Output of second multiplexer
 wire [NB_REG-1:0] mpx1_to_mpx2;     // Output of first multiplexer
-wire [NB_REG-1:0] instr_addr;
+wire [NB_WIDHT-1:0] instr_addr;
 
 
 // First multiplexer: Selects between PC+4 and immediate value
@@ -102,7 +103,7 @@ pc #(
     .PC_WIDTH(NB_REG)
 ) u_pc (
     .i_clk      (i_clk              ),
-    .i_reset    (i_reset            ),
+    .i_reset    (i_reset | i_dunit_reset_pc),
     .i_enable   (i_dunit_clk_en     ),
     .PCWrite    (i_PCWrite          ),
     .pc_in      (mpx3_to_pc         ),
@@ -126,11 +127,11 @@ ram_async_single_port #(
       .i_clk       (i_clk       ),
       .i_reset     (i_reset     ),
       .i_we        (i_dunit_w_en),
-      .i_addr      (instr_addr[NB_WIDHT-1:0] ),
+      .i_addr      (instr_addr ),
       .i_data_in   (i_dunit_data),
       .o_data_out  (o_instruction)
   );
 
-assign instr_addr = i_dunit_w_en ? i_dunit_addr : pc_to_mem;
+assign instr_addr = i_dunit_w_en ? i_dunit_addr[NB_WIDHT-1:0] : pc_to_mem[NB_WIDHT-1:0];
     
 endmodule

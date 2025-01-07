@@ -9,6 +9,7 @@ module pipeline #(
     input               i_reset         ,
 
     input               i_dunit_clk_en  ,
+    input               i_dunit_reset_pc,
     input               i_dunit_w_en    ,       //write in instruction memory
     input [NB_REG-1:0]  i_dunit_mem_addr,
     input [NB_REG-1:0]  i_dunit_mem_data
@@ -33,6 +34,7 @@ IF #(
     .i_Jump         (w_signals_from_controlU[19]),         // Jump signal
     .i_JSel         (w_signals_from_controlU[18]),         // Selector for jump address
     .i_PCWrite      (~w_stall),      // Write enable for PC
+    .i_dunit_reset_pc(i_dunit_reset_pc),
     .i_inmed        (w_branch_target),        // Immediate value for jump/branch
     .i_inst_to_mxp  (w_intruction_if_id[25:0]),  // Instruction bits for concatenation
     .i_pc_jsel      (w_pc_jsel_id_to_if),      // PC value for jump select
@@ -137,7 +139,7 @@ hazard_unit u_hazard_unit(
     .o_flush      (w_flush),
     .o_stall      (w_stall)
 );
-wire [NB_REG-1:0] w_signals_from_controlU;
+wire [20-1:0] w_signals_from_controlU;
 // FORWARDING UNIT IN ID
 forwarding_unit_ID #(
     .NB_ADDR (NB_ADDR) // Default width for register addresses
