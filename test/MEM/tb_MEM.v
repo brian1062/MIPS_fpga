@@ -14,6 +14,7 @@ module tb_MEM;
     reg [NB_WIDTH-1:0]    i_mem_data;
     reg                   i_mem_read_CU;
     reg                   i_mem_write_CU;
+    reg i_dunit_r_data;
     reg [2:0]             i_BHW_CU;
     wire [NB_WIDTH-1:0]   o_read_data;
 
@@ -28,6 +29,7 @@ module tb_MEM;
         .i_mem_addr(i_mem_addr),
         .i_mem_data(i_mem_data),
         .i_mem_read_CU(i_mem_read_CU),
+        .i_dunit_r_data(i_dunit_r_data),
         .i_mem_write_CU(i_mem_write_CU),
         .i_BHW_CU(i_BHW_CU),
         .o_read_data(o_read_data)
@@ -45,6 +47,7 @@ module tb_MEM;
         i_mem_data = 0;
         i_mem_read_CU = 0;
         i_mem_write_CU = 0;
+        i_dunit_r_data = 0;
         i_BHW_CU = 3'b000;
 
         // Reset de la memoria

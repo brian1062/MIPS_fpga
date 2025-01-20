@@ -53,6 +53,9 @@ module ID #(
     input         [NB_REG-1:0] i_aluResult         , // ALU result for forwarding.
     input                      i_isBeq             , // BEQ indicator signal.
     input                      i_branch            , // Branch signal.
+
+    input         [NB_ADDR-1:0]i_dunit_addr        ,
+    output        [NB_REG -1:0]o_dunit_reg         ,
     
     // <-#
     output        [NB_REG-1:0] o_pc_jsel_to_IF     , // PC value for jump/branch.
@@ -100,6 +103,8 @@ register_mem #(
     .i_rt_addr      (i_inst_from_IF[20:16]),
     .i_wb_addr      (i_WB_addr            ),   //from wb
     .i_wb_data      (i_WB_data            ),   //from wb
+    .i_dunit_addr   (i_dunit_addr         ),
+    .o_dunit_reg    (o_dunit_reg          ),
     .o_rs_data      (o_alu_rs_data        ),
     .o_rt_data      (o_alu_rt_data        )
 );

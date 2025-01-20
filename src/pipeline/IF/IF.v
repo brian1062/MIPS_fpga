@@ -18,9 +18,9 @@
 // Inputs:
 // - i_clk: Clock signal (active on positive edge)
 // - i_reset: Asynchronous reset (active high)
-// - i_dunit_clk_en: Enable signal for clock gating in data unit
-// - i_dunit_w_en: Write enable signal for the data unit
-// - i_dunit_addr: Address input for the data unit
+// - i_dunit_clk_en: Enable signal for clock gating in debug unit
+// - i_dunit_w_en: Write enable signal for the debug unit
+// - i_dunit_addr: Address input for the debug unit
 // - i_PCSrc: Selector for PC source (0: PC+4, 1: Immediate)
 // - i_Jump: Control signal for jump operations
 // - i_JSel: Selector for jump address sources
@@ -28,7 +28,7 @@
 // - i_inmed: Immediate value for jump/branch
 // - i_inst_to_mxp: Instruction bits for jump address concatenation
 // - i_pc_jsel: PC value for jump select operations
-// - i_dunit_data: Data input for writing into instruction memory
+// - i_dunit_data: debug input for writing into instruction memory
 // Outputs:
 // - o_pcplus4: Calculated PC+4 value for next instruction
 // - o_instruction: Fetched instruction from instruction memory
@@ -43,9 +43,9 @@ module IF
 (
     input                   i_clk,          // Clock signal
     input                   i_reset,        // Reset signal
-    input                   i_dunit_clk_en, // Clock enable signal for data unit
-    input                   i_dunit_w_en,   // Write enable signal for data unit
-    input  [NB_REG-1:0]   i_dunit_addr,   // Address input for data unit
+    input                   i_dunit_clk_en, // Clock enable signal for debug unit
+    input                   i_dunit_w_en,   // Write enable signal for debug unit
+    input  [NB_REG-1:0]     i_dunit_addr,   // Address input for debug unit
     input                   i_PCSrc,        // Selector for PC source
     input                   i_Jump,         // Jump signal
     input                   i_JSel,         // Selector for jump address
@@ -54,7 +54,7 @@ module IF
     input  [NB_REG-1:0]     i_inmed,        // Immediate value for jump/branch
     input  [NB_INST-1:0]    i_inst_to_mxp,  // Instruction bits for concatenation
     input  [NB_REG-1:0]     i_pc_jsel,      // PC value for jump select
-    input  [NB_REG-1:0]     i_dunit_data,   // Data for instruction memory write
+    input  [NB_REG-1:0]     i_dunit_data,   // debug for instruction memory write
     output [NB_REG-1:0]     o_pcplus4,      // Calculated PC+4
     output [NB_REG-1:0]     o_instruction   // Instruction fetched from memory
 );
