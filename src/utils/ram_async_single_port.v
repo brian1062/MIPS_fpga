@@ -10,7 +10,9 @@ module ram_async_single_port
     input                   i_we        ,
     input  [NB_ADDR-1:0]    i_addr      ,
     input  [NB_WIDHT-1:0]   i_data_in   ,
-    output [NB_WIDHT-1:0]   o_data_out
+    input  [NB_ADDR-1:0]    i_dunit_addr,
+    output [NB_WIDHT-1:0]   o_data_out  ,
+    output [NB_WIDHT-1:0]   o_data_to_dunit
 );  
 
 reg [NB_DATA-1:0] memory [2**NB_ADDR-1:0];
@@ -31,6 +33,6 @@ always @(posedge i_clk) begin
 end
 
 assign o_data_out = {memory[i_addr], memory[i_addr+1], memory[i_addr+2], memory[i_addr+3]};
-
+assign o_data_to_dunit = {memory[i_dunit_addr], memory[i_dunit_addr+1], memory[i_dunit_addr+2], memory[i_dunit_addr+3]};
     
 endmodule

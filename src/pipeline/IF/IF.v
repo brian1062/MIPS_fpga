@@ -129,7 +129,9 @@ ram_async_single_port #(
       .i_we        (i_dunit_w_en),
       .i_addr      (instr_addr ),
       .i_data_in   (i_dunit_data),
-      .o_data_out  (o_instruction)
+      .i_dunit_addr(9'b0),
+      .o_data_out  (o_instruction),
+      .o_data_to_dunit()
   );
 
 assign instr_addr = i_dunit_w_en ? i_dunit_addr[NB_WIDHT-1:0] : pc_to_mem[NB_WIDHT-1:0];

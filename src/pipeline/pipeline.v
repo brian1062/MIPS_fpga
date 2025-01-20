@@ -11,15 +11,15 @@ module pipeline #(
     input               i_dunit_clk_en  ,
     input               i_dunit_reset_pc,
     input               i_dunit_w_en    ,       //write in instruction memory
-    input               i_dunit_r_data  ,       // if 1 read data from datamemory dunit poner en 0 para mips
-    input [NB_WIDHT-1:0]i_dunit_addr_data,      //datamemory
-    input [NB_ADDR-1:0] i_dunit_addr,           //registermemory
-    
     input [NB_REG-1:0]  i_dunit_mem_addr,       //instruction memory
     input [NB_REG-1:0]  i_dunit_data_if,        //instruction memory
+    
+    input [NB_ADDR-1:0] i_dunit_addr    ,       //registermemory
+    output[NB_REG-1:0]  o_dunit_reg     ,       //registermemory
+    
+    input [NB_WIDHT-1:0]i_dunit_addr_data,      //datamemory
     output[NB_REG-1:0]  o_dunit_mem_data,       //datamemory
-    output[NB_REG-1:0]  o_dunit_reg             //registermemory
-
+    output              o_halt
 
 
 );
@@ -39,7 +39,7 @@ IF #(
     .i_PCSrc        (w_PCSrc),        // Selector for PC source
     .i_Jump         (w_signals_from_controlU[19]),         // Jump signal
     .i_JSel         (w_signals_from_controlU[18]),         // Selector for jump address
-    .i_PCWrite      (~w_stall),      // Write enable for PC
+    .i_PCWrite      (!w_stall | !w_signals_from_controlU[0]),      // Write enable for PC
     .i_dunit_reset_pc(i_dunit_reset_pc),
     .i_inmed        (w_branch_target),        // Immediate value for jump/branch
     .i_inst_to_mxp  (w_intruction_if_id[25:0]),  // Instruction bits for concatenation
@@ -54,12 +54,12 @@ IF_ID #(
     .NB_REG (NB_REG)
 ) uu_IF_ID(
     .i_clk          (i_clk),
-    .i_reset        (i_reset),
+    .i_reset        (i_reset),   //add | jump o ver
     .i_dunit_clk_en (i_dunit_clk_en),
     .i_pc_four      (w_pcplus4_if_to_ifid),
     .i_data_ins_mem (w_intruction_if),
     .i_flush        (w_flush),   // en 1 flush = reset register
-    .i_write        (~w_stall),   //TODO:VERS SI FUNCIONA EL ~ EN 0 STALL mantengo valor anteriores esto debo conectarlo al pc tmb T
+    .i_write        (!w_stall),   //TODO:VERS SI FUNCIONA EL ~ EN 0 STALL mantengo valor anteriores esto debo conectarlo al pc tmb T
     .o_pc_four      (w_pc4_ifid_id),
     .o_data_ins_mem (w_intruction_if_id)
 
@@ -132,7 +132,7 @@ control_unit #(
     .NB_SGN    (20),
     .NB_OP     (NB_OP)
 ) uu_control_unit(
-    .i_enable       (~w_flush) , //TODO: VER SI TOMA BIEN EL NEGADO
+    .i_enable       (!w_flush) , //TODO: VER SI TOMA BIEN EL NEGADO
     .i_inst_opcode  (w_intruction_if_id[31:26]) ,   //instruction [31:26]
     .i_inst_function(w_intruction_if_id[5:0]) ,   //instruction [5:0]
     .o_signals      (w_signals_from_controlU)
@@ -146,7 +146,7 @@ hazard_unit u_hazard_unit(
     .i_rt_ex      (w_rt_addr_idex_ex),
     .i_mem_read_ex(w_controlU_idex_ex[8]),  
     .o_flush      (w_flush),
-    .o_stall      (w_stall)
+    .o_stall      (w_stall | w_signals_from_controlU[0]) //w_signals_from_controlU[0]=halt
 );
 wire [20-1:0] w_signals_from_controlU;
 // FORWARDING UNIT IN ID
@@ -295,7 +295,6 @@ MEM #(
     .i_mem_read_CU   (w_controlU_exm_m[8]),   // Read enable
     .i_mem_write_CU  (w_controlU_exm_m[7]),   // Write enable
     .i_BHW_CU        (w_controlU_exm_m[6:4]),         // Byte/halfword/word control signal
-    .i_dunit_r_data  (i_dunit_r_data)  ,
     .i_dunit_addr_data(i_dunit_addr_data),
     .o_read_data     (w_read_data_m_mwb),       // Data read
     .o_dunit_mem_data(o_dunit_mem_data)
@@ -328,6 +327,8 @@ wire [NB_REG-1:0] w_alu_result_mwb_wb;
 wire [NB_REG-1:0] w_read_data_mwb_wb;
 wire [4-1:0] w_controlU_mwb_wb;
 wire [NB_ADDR-1:0] w_data_addr_from_mwb;
+
+assign o_halt = w_controlU_mwb_wb[0];
 // WB MODULE
 WB #(
     .NB_REG   (NB_REG) // Default width of registers and data buses
