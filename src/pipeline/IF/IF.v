@@ -127,9 +127,9 @@ ram_async_single_port #(
       .i_clk       (i_clk       ),
       .i_reset     (i_reset     ),
       .i_we        (i_dunit_w_en),
-      .i_addr      (instr_addr ),
+      .i_addr      (instr_addr),
       .i_data_in   (i_dunit_data),
-      .i_dunit_addr(9'b0),
+      .i_dunit_addr(i_dunit_addr[NB_WIDHT-1:0]),
       .o_data_out  (o_instruction),
       .o_data_to_dunit()
   );

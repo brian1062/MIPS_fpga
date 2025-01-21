@@ -10,7 +10,7 @@ module pipeline #(
 
     input               i_dunit_clk_en  ,
     input               i_dunit_reset_pc,
-    input               i_dunit_w_en    ,       //write in instruction memory
+    input               i_dunit_w_mem   ,       //write in instruction memory
     input [NB_REG-1:0]  i_dunit_mem_addr,       //instruction memory
     input [NB_REG-1:0]  i_dunit_data_if,        //instruction memory
     
@@ -34,7 +34,7 @@ IF #(
     .i_clk          (i_clk),          // Clock signal
     .i_reset        (i_reset),        // Reset signal
     .i_dunit_clk_en (i_dunit_clk_en), // Clock enable signal for data unit
-    .i_dunit_w_en   (i_dunit_w_en),   // Write enable signal for data unit
+    .i_dunit_w_en   (i_dunit_w_mem),   // Write enable signal for data unit
     .i_dunit_addr   (i_dunit_mem_addr),   // Address input for data unit
     .i_PCSrc        (w_PCSrc),        // Selector for PC source
     .i_Jump         (w_signals_from_controlU[19]),         // Jump signal
@@ -146,7 +146,7 @@ hazard_unit u_hazard_unit(
     .i_rt_ex      (w_rt_addr_idex_ex),
     .i_mem_read_ex(w_controlU_idex_ex[8]),  
     .o_flush      (w_flush),
-    .o_stall      (w_stall | w_signals_from_controlU[0]) //w_signals_from_controlU[0]=halt
+    .o_stall      (w_stall) //w_signals_from_controlU[0]=halt agregar
 );
 wire [20-1:0] w_signals_from_controlU;
 // FORWARDING UNIT IN ID
