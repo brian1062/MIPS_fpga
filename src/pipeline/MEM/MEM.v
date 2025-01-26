@@ -35,7 +35,7 @@ module MEM #(
     input                   i_mem_read_CU   ,    // Read enable
     input                   i_mem_write_CU  ,   // Write enable
     input  [2:0]            i_BHW_CU        ,         // Byte/halfword/word control signal
-    input  [NB_ADDR-1:0]   i_dunit_addr_data,
+    input  [NB_WIDTH-1:0]   i_dunit_addr_data,
     output [NB_WIDTH-1:0]   o_read_data     ,       // Data read
     output [NB_WIDTH-1:0]   o_dunit_mem_data
 );
@@ -61,7 +61,7 @@ ram_async_single_port #(
     .i_we      (i_mem_write_CU),
     .i_addr    (i_mem_addr[NB_ADDR-1:0]),
     .i_data_in (data_to_mem),
-    .i_dunit_addr(i_dunit_addr_data),
+    .i_dunit_addr(i_dunit_addr_data[NB_ADDR-1:0]),
     .o_data_out(mem_data_out),
     .o_data_to_dunit(o_dunit_mem_data)
 );

@@ -39,12 +39,10 @@ module tb_pipeline;
         .i_dunit_clk_en(i_dunit_clk_en),
         .i_dunit_reset_pc(i_dunit_reset_pc),
         .i_dunit_w_mem(i_dunit_w_en),
-        .i_dunit_addr_data(i_dunit_addr_data),
-        .i_dunit_addr(i_dunit_addr),
-        .i_dunit_mem_addr(i_dunit_mem_addr),
+        .i_dunit_addr(i_dunit_addr_data),
         .i_dunit_data_if(i_dunit_data_if),
-        .o_dunit_mem_data(o_dunit_mem_data),
-        .o_dunit_reg(o_dunit_reg)
+        .o_dunit_reg(o_dunit_reg),
+        .o_dunit_mem_data(o_dunit_mem_data)
     );
 
     // Test Scenarios
@@ -107,6 +105,9 @@ module tb_pipeline;
 
         i_dunit_w_en = 0;
         i_dunit_reset_pc = 0;
+        #10;
+        //comparar
+        #10; 
 
         // End simulation
         #500;

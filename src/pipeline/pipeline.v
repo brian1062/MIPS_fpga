@@ -11,14 +11,11 @@ module pipeline #(
     input               i_dunit_clk_en  ,
     input               i_dunit_reset_pc,
     input               i_dunit_w_mem   ,       //write in instruction memory
-    input [NB_REG-1:0]  i_dunit_mem_addr,       //instruction memory
+    input [NB_REG-1:0]  i_dunit_addr,           //ADDR TO instruction memory, REGISTER MEMORY and datamemory
     input [NB_REG-1:0]  i_dunit_data_if,        //instruction memory
     
-    input [NB_ADDR-1:0] i_dunit_addr    ,       //registermemory
-    output[NB_REG-1:0]  o_dunit_reg     ,       //registermemory
-    
-    input [NB_WIDHT-1:0]i_dunit_addr_data,      //datamemory
-    output[NB_REG-1:0]  o_dunit_mem_data,       //datamemory
+    output[NB_REG-1:0]  o_dunit_reg     ,       //registermemory TO DEBUG UNIT  
+    output[NB_REG-1:0]  o_dunit_mem_data,       //datamemory TO DEBUG UNIT
     output              o_halt
 
 
@@ -35,7 +32,7 @@ IF #(
     .i_reset        (i_reset),        // Reset signal
     .i_dunit_clk_en (i_dunit_clk_en), // Clock enable signal for data unit
     .i_dunit_w_en   (i_dunit_w_mem),   // Write enable signal for data unit
-    .i_dunit_addr   (i_dunit_mem_addr),   // Address input for data unit
+    .i_dunit_addr   (i_dunit_addr),   // Address input for data unit
     .i_PCSrc        (w_PCSrc),        // Selector for PC source
     .i_Jump         (w_signals_from_controlU[19]),         // Jump signal
     .i_JSel         (w_signals_from_controlU[18]),         // Selector for jump address
@@ -94,7 +91,7 @@ ID #(
     .i_aluResult         (w_alu_result_exm_m), // ALU result for forwarding. EX/M
     .i_isBeq             (w_signals_from_controlU[16]), // BEQ indicator signal.
     .i_branch            (w_signals_from_controlU[17]), // Branch signal.
-    .i_dunit_addr        (i_dunit_addr)       ,
+    .i_dunit_addr        (i_dunit_addr[4:0])       ,
     .o_dunit_reg         (o_dunit_reg)        ,
     
     // <-#                                          
@@ -295,7 +292,7 @@ MEM #(
     .i_mem_read_CU   (w_controlU_exm_m[8]),   // Read enable
     .i_mem_write_CU  (w_controlU_exm_m[7]),   // Write enable
     .i_BHW_CU        (w_controlU_exm_m[6:4]),         // Byte/halfword/word control signal
-    .i_dunit_addr_data(i_dunit_addr_data),
+    .i_dunit_addr_data(i_dunit_addr),
     .o_read_data     (w_read_data_m_mwb),       // Data read
     .o_dunit_mem_data(o_dunit_mem_data)
 
