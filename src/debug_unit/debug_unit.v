@@ -1,18 +1,19 @@
 module debug_unit 
 #(
-    parameter NB      = 8 ,
-    parameter NB_DATA = 32,
+    parameter NB_REG  = 32,
+    parameter DBIT    = 8 ,
     parameter SB_TICK = 16,
     parameter DVSR    = 326,
-    parameter NB_REG  = 32
+    parameter DVSR_BIT= 9  ,
+    parameter FIFO_W  = 5  
 ) 
 (
     input               i_clk       ,
     input               i_reset     ,
 
     input               i_rx        ,
-    input [NB_DATA-1:0] i_reg_data  ,
-    input [NB_DATA-1:0] i_mem_data  ,
+    input [NB_REG-1:0] i_reg_data  ,
+    input [NB_REG-1:0] i_mem_data  ,
     input               i_halt      ,
 
     output              o_tx        ,
@@ -21,16 +22,14 @@ module debug_unit
     output[NB_REG-1:0]  o_addr_inst , 
     output              o_enable    ,
     output              o_reset_mips  
-
-
 );
  
 UART #(//19200 bauds, databit,1stopbit 2^2 FIFO
-    .DBIT     (NB     ),      //! DATA BIT
+    .DBIT     (DBIT   ),      //! DATA BIT
     .SB_TICK  (SB_TICK),      //! STICKS FOR STOP BITS
     .DVSR     (DVSR   ),      //! baud rate divisor ( Clock/(BaudRate*16) )
-    .DVSR_BIT (  9),      //! bits of divisor representa en cuanto bits entra el dvsr
-    .FIFO_W   (  5)       //! FIFO width FIFO=2^FIFO_W
+    .DVSR_BIT (DVSR_BIT),      //! bits of divisor representa en cuanto bits entra el dvsr
+    .FIFO_W   (FIFO_W)       //! FIFO width FIFO=2^FIFO_W
 ) u_uart (
     .clk     (i_clk),  //! clock 
     .reset   (i_reset),  //! reset

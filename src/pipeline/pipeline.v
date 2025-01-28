@@ -256,8 +256,7 @@ forwarding_unit_EX #(
 // EX/M REGS
 EX_M #(
     .NB_REG   (NB_REG),
-    .NB_CTRL  (9 ),
-    .NB_ADDR  (NB_ADDR )
+    .NB_CTRL  (9 )
 ) u_EX_M(
     .i_clk              (i_clk) ,
     .i_reset            (i_reset) ,
