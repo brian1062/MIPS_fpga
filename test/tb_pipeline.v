@@ -75,7 +75,7 @@ module tb_pipeline;
         #10;
 
         // SW: Guardar el contenido de $2 (valor: 2) en la posición 4 de la memoria de datos
-        i_dunit_addr = 32'h0000_0012;
+        i_dunit_addr = 32'h0000_00C;
         i_dunit_data_if = 32'b101011_00000_00010_00000_00000_000100; // SW $2, 4($0)
         // Acción esperada: El valor 2 de $2 se almacena en la dirección 4 de la memoria de datos.
         #10;
