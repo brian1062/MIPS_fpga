@@ -1,6 +1,7 @@
 module EX_M 
 #(
     parameter NB_REG =  32,
+    parameter NB_ADDR=   5,
     parameter NB_CTRL=  9 
 ) (
     input                           i_clk               ,
@@ -10,7 +11,7 @@ module EX_M
     input           [NB_REG-1:0]    i_pc_eight          ,
     input           [NB_REG-1:0]    i_alu_result        ,
     input           [NB_REG-1:0]    i_w_data            ,
-    input           [NB_REG-1:0]   i_data_addr         ,
+    input           [NB_ADDR-1:0]    i_data_addr         ,
 
     input           [NB_CTRL-1:0]   i_control_from_ex   ,
 
@@ -25,7 +26,7 @@ module EX_M
 reg [NB_REG-1:0] pc_reg;
 reg [NB_REG-1:0] alu_es_reg;
 reg [NB_REG-1:0] w_data_reg;
-reg [NB_REG-1:0] data_addr_reg;
+reg [NB_ADDR-1:0] data_addr_reg;
 
 reg [NB_CTRL-1:0] control_reg;
 

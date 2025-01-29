@@ -45,8 +45,8 @@ UART #(//19200 bauds, databit,1stopbit 2^2 FIFO
 
 wire fifo_rx_empty;
 wire fifo_tx_full;
-wire [NB-1:0] read_data;
-wire [NB-1:0] tx_data;
+wire [DBIT-1:0] read_data;
+wire [DBIT-1:0] tx_data;
 wire rd_uart_wire, wr_uart_wire;
 
 //! state params
@@ -76,8 +76,8 @@ assign o_reset_mips = reset;
 assign o_w_mem = write_mem;
 //! var
 reg [NB_REG-1:0] counter  , next_counter  ;
-reg [NB-1:0] state    , next_state    ;
-reg [NB-1:0] waiting_state , next_waiting_state;
+reg [DBIT-1:0] state    , next_state    ;
+reg [DBIT-1:0] waiting_state , next_waiting_state;
 reg step_mode, next_step_mode;
 reg enable,  reset, write_mem, rd_reg, wr_reg;
 reg [NB_REG-1:0] inst_to_mem, next_inst_to_mem; 
@@ -246,7 +246,7 @@ always @(*) begin
                 begin
                     next_counter = 0;
                     next_addr_inst = addr_inst +4; // en data va de a 4
-                    if (addr_inst == 512) begin
+                    if (addr_inst == 124) begin
                         next_addr_inst = 0;
                         next_state = RETURN;
                     end

@@ -256,6 +256,7 @@ forwarding_unit_EX #(
 // EX/M REGS
 EX_M #(
     .NB_REG   (NB_REG),
+    .NB_ADDR  (NB_ADDR),
     .NB_CTRL  (9 )
 ) u_EX_M(
     .i_clk              (i_clk) ,
@@ -281,7 +282,7 @@ wire [9-1:0] w_controlU_exm_m;
 // MEM MEMORY MODULE
 MEM #(
     .NB_WIDTH  (NB_REG) ,    // Data width
-    .NB_ADDR   (9 ) ,     // Address width
+    .NB_ADDR   (7 ) ,     // Address width
     .NB_DATA   (8 )       // Memory element width
 ) u_MEM(
     .i_clk           (i_clk),        // Clock signal
