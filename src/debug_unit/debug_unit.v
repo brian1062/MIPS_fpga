@@ -23,6 +23,13 @@ module debug_unit
     output              o_enable    ,
     output              o_reset_mips  
 );
+
+wire fifo_rx_empty;
+wire fifo_tx_full;
+wire [DBIT-1:0] read_data;
+wire [DBIT-1:0] tx_data;
+wire rd_uart_wire, wr_uart_wire;
+
  
 UART #(//19200 bauds, databit,1stopbit 2^2 FIFO
     .DBIT     (DBIT   ),      //! DATA BIT
@@ -43,11 +50,6 @@ UART #(//19200 bauds, databit,1stopbit 2^2 FIFO
     .r_data  (read_data)//! data to read  output
 );
 
-wire fifo_rx_empty;
-wire fifo_tx_full;
-wire [DBIT-1:0] read_data;
-wire [DBIT-1:0] tx_data;
-wire rd_uart_wire, wr_uart_wire;
 
 //! state params
 localparam IDLE         = 8'b0000_0001;
@@ -65,15 +67,7 @@ localparam RESET        = 8'b0000_1100;
 localparam RETURN       = 8'b0000_1101;
 localparam HALT_CODE    = 32'h3f;
 
-//!
-assign rd_uart_wire = rd_reg;
-assign wr_uart_wire = wr_reg;
-assign tx_data  = data_to_tx;
-assign o_inst = inst_to_mem; //instructions to mem
-assign o_addr_inst = addr_inst;
-assign o_enable = enable;
-assign o_reset_mips = reset;
-assign o_w_mem = write_mem;
+
 //! var
 reg [NB_REG-1:0] counter  , next_counter  ;
 reg [DBIT-1:0] state    , next_state    ;
@@ -350,5 +344,15 @@ always @(*) begin
     end 
     endcase
 end
+
+//!
+assign rd_uart_wire = rd_reg;
+assign wr_uart_wire = wr_reg;
+assign tx_data  = data_to_tx;
+assign o_inst = inst_to_mem; //instructions to mem
+assign o_addr_inst = addr_inst;
+assign o_enable = enable;
+assign o_reset_mips = reset;
+assign o_w_mem = write_mem;
 
 endmodule

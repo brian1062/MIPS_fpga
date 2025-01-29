@@ -2,7 +2,7 @@ module UART
 #(//19200 bauds, databit,1stopbit 2^2 FIFO
     parameter DBIT     =  32,      //! DATA BIT
     parameter SB_TICK  =  16,      //! STICKS FOR STOP BITS
-    parameter DVSR     = 326,      //! baud rate divisor ( Clock/(BaudRate*16) )
+    parameter DVSR     = 163,      //! baud rate divisor ( Clock/(BaudRate*16) )
     parameter DVSR_BIT =   9,      //! bits of divisor
     parameter FIFO_W   =   2       //! FIFO width FIFO=2^FIFO_W
 ) 

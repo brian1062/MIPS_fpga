@@ -20,6 +20,71 @@ module pipeline #(
 
 
 );
+//WIRES IF
+wire w_PCSrc;
+wire [NB_REG-1:0] w_branch_target;
+wire [NB_REG-1:0] w_intruction_if_id;
+wire [NB_REG-1:0] w_pc_jsel_id_to_if;  //mux 3 if
+wire [NB_REG-1:0] w_pcplus4_if_to_ifid;
+wire [NB_REG-1:0] w_intruction_if;
+
+//WIRES ID
+wire [NB_REG-1:0] w_pc4_ifid_id;
+wire w_forwardA_id;
+wire w_forwardB_id;
+wire w_flush;
+wire w_stall;
+// #-> 
+wire [NB_REG-1:0] w_pc8_id_idex;
+wire [NB_REG-1:0] w_sign_ext_id_idex;
+wire [NB_REG-1:0] w_rs_data_id_idex;
+wire [NB_REG-1:0] w_rt_data_id_idex;
+wire [NB_ADDR-1:0]w_rs_addr_id_idex;
+wire [NB_ADDR-1:0]w_rt_addr_id_idex;
+wire [NB_ADDR-1:0]w_rd_addr_id_idex;
+wire [NB_OP-1:0]w_op_id_idex;
+
+//wire id/ex to ex
+wire [NB_REG-1:0] w_pc8_idex_exm;
+wire [NB_REG-1:0] w_rs_data_idex_ex;
+wire [NB_REG-1:0] w_rt_data_idex_ex;
+wire [NB_ADDR-1:0]w_rs_addr_idex_ex;
+wire [NB_ADDR-1:0]w_rt_addr_idex_ex;
+wire [NB_ADDR-1:0]w_rd_addr_idex_ex;
+wire [NB_OP-1:0]w_op_idex_ex;
+
+wire [16-1:0] w_controlU_idex_ex;
+wire [NB_REG-1:0] w_sign_ext_idex_ex;
+
+wire [20-1:0] w_signals_from_controlU;
+
+//wire FORDWARD EX
+wire [2-1:0] w_forwardA_ex;
+wire [2-1:0] w_forwardB_ex;
+wire [NB_REG-1:0]   w_alu_result_ex_exm;
+wire [NB_REG-1:0]   w_write_data_ex_exm;
+wire [NB_ADDR-1:0]  w_data_addr_ex_exm;
+
+//wire FORDWARD EX MEM
+wire [NB_REG -1:0] w_pc8_exm_mwb;
+wire [NB_REG -1:0] w_alu_result_exm_m;
+wire [NB_REG -1:0] w_write_data_exm_m;
+wire [NB_ADDR-1:0] w_data_addr_exm_mwb;
+
+wire [9-1:0] w_controlU_exm_m;
+
+//wire MEM WB
+wire [NB_REG-1:0] w_pc8_mwb_m;
+wire [NB_REG-1:0] w_alu_result_mwb_wb;
+wire [NB_REG-1:0] w_read_data_mwb_wb;
+wire [4-1:0] w_controlU_mwb_wb;
+wire [NB_ADDR-1:0] w_data_addr_from_mwb;
+
+wire [NB_REG -1:0] w_read_data_m_mwb;
+
+
+wire [NB_REG-1:0] w_data_to_reg_wb;
+
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 // IF MODULE
@@ -62,13 +127,7 @@ IF_ID #(
 
 );
 
-//WIRES IF
-wire w_PCSrc;
-wire [NB_REG-1:0] w_branch_target;
-wire [NB_REG-1:0] w_intruction_if_id;
-wire [NB_REG-1:0] w_pc_jsel_id_to_if;  //mux 3 if
-wire [NB_REG-1:0] w_pcplus4_if_to_ifid;
-wire [NB_REG-1:0] w_intruction_if;
+
 
 // ID INSTRUCTION DECODE ----------------------------------------------------------------------------------
 ID #(
@@ -108,21 +167,7 @@ ID #(
     .o_rd_addr           (w_rd_addr_id_idex), // RD register address.
     .o_rt_data           (w_rt_data_id_idex)// Operand data for RT.
 );
-//WIRES ID
-wire [NB_REG-1:0] w_pc4_ifid_id;
-wire w_forwardA_id;
-wire w_forwardB_id;
-wire w_flush;
-wire w_stall;
-// #-> 
-wire [NB_REG-1:0] w_pc8_id_idex;
-wire [NB_REG-1:0] w_sign_ext_id_idex;
-wire [NB_REG-1:0] w_rs_data_id_idex;
-wire [NB_REG-1:0] w_rt_data_id_idex;
-wire [NB_ADDR-1:0]w_rs_addr_id_idex;
-wire [NB_ADDR-1:0]w_rt_addr_id_idex;
-wire [NB_ADDR-1:0]w_rd_addr_id_idex;
-wire [NB_OP-1:0]w_op_id_idex;
+
 
 //CONTROL UNIT
 control_unit #(
@@ -145,7 +190,7 @@ hazard_unit u_hazard_unit(
     .o_flush      (w_flush),
     .o_stall      (w_stall) //w_signals_from_controlU[0]=halt agregar
 );
-wire [20-1:0] w_signals_from_controlU;
+
 // FORWARDING UNIT IN ID
 forwarding_unit_ID #(
     .NB_ADDR (NB_ADDR) // Default width for register addresses
@@ -189,17 +234,6 @@ ID_EX #(
     .o_rt_addr       (w_rt_addr_idex_ex),
     .o_rd_addr       (w_rd_addr_idex_ex)
 );
-//wire id/ex to ex
-wire [NB_REG-1:0] w_pc8_idex_exm;
-wire [NB_REG-1:0] w_rs_data_idex_ex;
-wire [NB_REG-1:0] w_rt_data_idex_ex;
-wire [NB_ADDR-1:0]w_rs_addr_idex_ex;
-wire [NB_ADDR-1:0]w_rt_addr_idex_ex;
-wire [NB_ADDR-1:0]w_rd_addr_idex_ex;
-wire [NB_OP-1:0]w_op_idex_ex;
-
-wire [16-1:0] w_controlU_idex_ex;
-wire [NB_REG-1:0] w_sign_ext_idex_ex;
 
 
 // EX EXECUTE MODULE
@@ -229,11 +263,7 @@ EX #(
     .o_rd_to_WB          (w_data_addr_ex_exm) // RD data for WB
 );
 
-wire [2-1:0] w_forwardA_ex;
-wire [2-1:0] w_forwardB_ex;
-wire [NB_REG-1:0]   w_alu_result_ex_exm;
-wire [NB_REG-1:0]   w_write_data_ex_exm;
-wire [NB_ADDR-1:0]  w_data_addr_ex_exm;
+
 //  FORWARDIN UNIT EX
 
 forwarding_unit_EX #(
@@ -273,12 +303,7 @@ EX_M #(
     .o_data_addr        (w_data_addr_exm_mwb) ,
     .o_control_from_ex  (w_controlU_exm_m)
 );
-wire [NB_REG -1:0] w_pc8_exm_mwb;
-wire [NB_REG -1:0] w_alu_result_exm_m;
-wire [NB_REG -1:0] w_write_data_exm_m;
-wire [NB_ADDR-1:0] w_data_addr_exm_mwb;
 
-wire [9-1:0] w_controlU_exm_m;
 // MEM MEMORY MODULE
 MEM #(
     .NB_WIDTH  (NB_REG) ,    // Data width
@@ -298,7 +323,7 @@ MEM #(
 
 );
 //----------------------------------------------------------------------------
-wire [NB_REG -1:0] w_read_data_m_mwb;
+
 // MEM/WB REG
 M_WB #(
     .NB_REG  (NB_REG),
@@ -319,11 +344,6 @@ M_WB #(
     .o_data_addr_ex_m (w_data_addr_from_mwb),
     .o_control_from_m (w_controlU_mwb_wb)
 );
-wire [NB_REG-1:0] w_pc8_mwb_m;
-wire [NB_REG-1:0] w_alu_result_mwb_wb;
-wire [NB_REG-1:0] w_read_data_mwb_wb;
-wire [4-1:0] w_controlU_mwb_wb;
-wire [NB_ADDR-1:0] w_data_addr_from_mwb;
 
 assign o_halt = w_controlU_mwb_wb[0];
 // WB MODULE
@@ -337,6 +357,6 @@ WB #(
     .i_isJal         (w_controlU_mwb_wb[1]),           // JAL control signal
     .o_data_to_reg   (w_data_to_reg_wb)     // Data to be written to register file
 );
-wire [NB_REG-1:0] w_data_to_reg_wb;
+
     
 endmodule

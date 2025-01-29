@@ -64,7 +64,7 @@ module ID #(
 
     // #->
     output        [NB_REG-1:0] o_pcplus8           , // PC + 8 (used in some jumps).
-    output signed [NB_REG-1:0] o_inst_sign_extended, // Sign-extended immediate value.
+    output signed [NB_REG-1:0] o_inst_sign_extended, // Sign-extended immediate value. TODO:VER SI VA SIGNED ACA O NO
     output        [NB_REG-1:0] o_rs_data           , // Operand data for RS.
     output        [6-1:0]o_op_r_tipe         , // Opcode or instruction type.
     output        [NB_ADDR-1:0]o_rs_addr           , // RS register address.
@@ -144,7 +144,7 @@ assign rs_equals_rt = | (o_rs_data ^ o_rt_data);
 
 wire wire_to_and;                // Selección según IsBeq
 mpx_2to1 #(
-    .NB_INPUT(NB_REG)          
+    .NB_INPUT(1)          
 ) u_mpx_beq_bne
 (
     .i_a       (rs_equals_rt),   
@@ -160,7 +160,9 @@ assign o_PCSrc_to_IF = i_branch & wire_to_and;
 // Branch Target Calculation
 // Computes the target address for branch instructions.
 /////////////////////////////////////////////////////////////
-assign o_branch_target = i_pcplus4 + (o_inst_sign_extended << 2); // se concatena el pc+4 con la instrucción mas su desplazamiento
+wire [NB_REG-1:0] extended_inst;
+assign extended_inst = o_inst_sign_extended;
+assign o_branch_target = i_pcplus4 + (extended_inst << 2); // se concatena el pc+4 con la instrucción mas su desplazamiento
 
 /////////////////////////////////////////////////////////////
 // Additional Outputs

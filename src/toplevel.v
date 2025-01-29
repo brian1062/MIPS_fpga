@@ -15,7 +15,7 @@ wire clk_50mhz;
 clk_wiz_0 u_clk_wiz_0
  (
   // Clock out ports
-        .clk_45mhz(clk_50mhz),
+        .clk_50mhz(clk_50mhz),
   // Status and control signals
         .reset(i_reset),
         .locked(),
@@ -27,8 +27,8 @@ debug_unit #(
     .NB_REG   (NB_REG),
     .DBIT     (8  ),
     .SB_TICK  (16 ),
-    .DVSR     (326),
-    .DVSR_BIT (9  ),
+    .DVSR     (163), //50mhz 50mhz/(19200*16)
+    .DVSR_BIT (8  ),
     .FIFO_W   (5  )
 ) u_debug_unit(
     .i_clk       (clk_50mhz),
