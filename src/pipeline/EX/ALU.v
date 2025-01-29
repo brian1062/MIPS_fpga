@@ -26,6 +26,7 @@ module ALU #(
     input      [NB_INPUT-1:0] alu_input_A,             // First operand
     input      [NB_INPUT-1:0] alu_input_B,             // Second operand
     input      [NB_CONTROL-1:0] i_alu_control_signals, // ALU control signals
+    input      [4:0] i_shamt,                          // Shift amount
 
     // Outputs
     output reg [NB_INPUT-1:0] o_alu_result        // ALU result
@@ -45,11 +46,15 @@ always @(*) begin
         6'b100101: o_alu_result = alu_input_A | alu_input_B;  // OR
         6'b100110: o_alu_result = alu_input_A ^ alu_input_B;  // XOR
         6'b100111: o_alu_result = ~(alu_input_A | alu_input_B); // NOR
-        6'b000000: o_alu_result = $unsigned(alu_input_B) << alu_input_A[4:0]; // SLL (Shift Left Logical)
-        6'b000010: o_alu_result = $unsigned(alu_input_B) >> alu_input_A[4:0]; // SRL (Shift Right Logical)
-        6'b000011: o_alu_result = $signed(alu_input_B) >>> alu_input_A[4:0]; // SRA (Shift Right Arithmetic)
-        6'b101010: o_alu_result = ($signed(alu_input_A) < $signed(alu_input_B)) ? 1 : 0; // SLT (Set Less Than)
-        6'b101011: o_alu_result = (alu_input_A < alu_input_B) ? 1 : 0; // SLTU (Set Less Than Unsigned)
+        6'b000000: o_alu_result = (alu_input_B) << i_shamt; // SLL (Shift Left Logical)
+        6'b000010: o_alu_result = (alu_input_B) >> i_shamt; // SRL (Shift Right Logical)
+        6'b000011: o_alu_result = $signed(alu_input_B) >>> i_shamt; // SRA (Shift Right Arithmetic)
+        6'b000100: o_alu_result = (alu_input_B) << alu_input_A; // SLLV (Shift Left Logical Variable)
+        6'b000110: o_alu_result = (alu_input_B) >> alu_input_A; // SRLV (Shift Right Logical Variable)
+        6'b000111: o_alu_result = $signed(alu_input_B) >>> alu_input_A; // SRAV (Shift Right Arithmetic Variable)
+        6'b101010: o_alu_result = ($signed(alu_input_A) < $signed(alu_input_B)); // SLT (Set Less Than)
+        6'b101011: o_alu_result = (alu_input_A < alu_input_B); // SLTU (Set Less Than Unsigned)
+        6'b001111: o_alu_result = {alu_input_B[31:16], 16'b0}; // LUI (Load Upper Immediate)
         default: o_alu_result = 0; // Default case (should never occur)
     endcase
 

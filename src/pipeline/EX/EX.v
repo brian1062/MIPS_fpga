@@ -122,6 +122,7 @@ ALU #(
     .alu_input_A           (alu_input_A          ),
     .alu_input_B           (alu_input_B          ),
     .i_alu_control_signals (alu_control_signals  ),
+    .i_shamt               (i_inst_sign_extended[10:6]),
     .o_alu_result          (o_alu_result         )
 );
 

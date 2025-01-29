@@ -50,6 +50,7 @@ localparam SRA  = 6'b000011; // Shift Word Right Arithmetic
 localparam SRAV = 6'b000111; // Shift Word Right Arithmetic Variable
 localparam SLT  = 6'b101010; // Set Less Than
 localparam SLTU = 6'b101011; // Set Less Than Unsigned
+localparam LUI  = 6'b001111; // Load Upper Immediate
 
 // ALUOp values from control unit
 localparam R_TYPE       = 4'b0010; // R-type instruction
@@ -95,7 +96,7 @@ always @(*) begin
         end
         I_TYPE_LUI: begin
             // Load upper immediate
-            o_alu_control_signals = SLL;
+            o_alu_control_signals = LUI;
         end
         I_TYPE_SLTI: begin
             // Set less than immediate
