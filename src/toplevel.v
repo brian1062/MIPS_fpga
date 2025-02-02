@@ -12,6 +12,16 @@ module toplevel
 
 wire clk_50mhz;
 
+wire reset_from_d_unit;
+wire enable_wire;
+wire [NB_REG-1:0] wire_addr;
+wire [NB_REG-1:0] wire_intruction;
+wire  write_mem;
+wire  wire_halt;
+
+wire [NB_REG-1:0] wire_data_mem;
+wire [NB_REG-1:0] wire_reg_mem ;
+
 clk_wiz_0 u_clk_wiz_0
  (
   // Clock out ports
@@ -44,15 +54,7 @@ debug_unit #(
     .o_enable    (enable_wire),
     .o_reset_mips(reset_from_d_unit)  
 );
-wire reset_from_d_unit;
-wire enable_wire;
-wire [NB_REG-1:0] wire_addr;
-wire [NB_REG-1:0] wire_intruction;
-wire  write_mem;
-wire  wire_halt;
 
-wire [NB_REG-1:0] wire_data_mem;
-wire [NB_REG-1:0] wire_reg_mem ;
 
 pipeline #(
     .NB_REG  (NB_REG),

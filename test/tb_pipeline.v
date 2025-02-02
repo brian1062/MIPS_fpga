@@ -330,7 +330,7 @@ module tb_pipeline;
         // 3. ADDI: Guardar 3+$4 en $5 de la memoria de registros
         i_dunit_addr = 32'h0000_000C;
         i_dunit_data_if = 32'b001000_00100_00101_00000_00000_000011; // ADDI $5, $4, 3  ($5 = $4 + 3)
-
+        #10;
         // // ----------- Riesgo de Control (BEQ) -----------
 
         // // 1. ADDI: Guardar 1 en $6 de la memoria de registros

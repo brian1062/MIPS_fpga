@@ -38,14 +38,30 @@ module forwarding_unit_ID
     input [NB_ADDR-1:0]     i_rd_ex_m,        // Destination register address in EX/MEM stage
     input                   i_regWrite_ex_m,  // Write enable signal from EX/MEM stage
 
-    output                  o_forwardA_ID,    // Forwarding control for rs in ID stage
-    output                  o_forwardB_ID     // Forwarding control for rt in ID stage
+    output  reg                o_forwardA_ID,    // Forwarding control for rs in ID stage
+    output  reg                o_forwardB_ID     // Forwarding control for rt in ID stage
 );
 
 // Forwarding logic for rs register
-assign o_forwardA_ID = (i_rs_id == i_rd_ex_m) && i_regWrite_ex_m;
+// assign o_forwardA_ID = (i_rs_id == i_rd_ex_m) && i_regWrite_ex_m;
 
-// Forwarding logic for rt register
-assign o_forwardB_ID = (i_rt_id == i_rd_ex_m) && i_regWrite_ex_m;
+// // Forwarding logic for rt register
+// assign o_forwardB_ID = (i_rt_id == i_rd_ex_m) && i_regWrite_ex_m;
+
+always @(*) 
+begin
+    if ((i_rs_id == i_rd_ex_m)&& i_regWrite_ex_m) begin
+        o_forwardA_ID = 1'b1;
+    end
+    else begin
+        o_forwardA_ID = 1'b0;
+    end
+    if ((i_rt_id == i_rd_ex_m) && i_regWrite_ex_m) begin
+        o_forwardB_ID = 1'b1;
+    end
+    else begin
+        o_forwardB_ID = 1'b0;
+    end
+end
 
 endmodule

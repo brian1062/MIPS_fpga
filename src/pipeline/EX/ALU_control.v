@@ -69,52 +69,56 @@ localparam BRANCH       = 4'b0111; // Branch instructions (e.g., BEQ, BNE)
 /////////////////////////////////////////////////////////////
 
 always @(*) begin
-    case (i_alu_op_CU)
-        R_TYPE: begin
-            // Directly pass the function code for R-type instructions
-            o_alu_control_signals = i_op_r_tipe; 
-        end
-        LOAD_STORE: begin
-            // Load/Store operations perform addition
-            o_alu_control_signals = ADD;
-        end
-        I_TYPE_ADDIU: begin
-            // Immediate addition
-            o_alu_control_signals = ADDU;
-        end
-        I_TYPE_ANDI: begin
-            // AND immediate
-            o_alu_control_signals = AND;
-        end
-        I_TYPE_ORI: begin
-            // OR immediate
-            o_alu_control_signals = OR;
-        end
-        I_TYPE_XORI: begin
-            // XOR immediate
-            o_alu_control_signals = XOR;
-        end
-        I_TYPE_LUI: begin
-            // Load upper immediate
-            o_alu_control_signals = LUI;
-        end
-        I_TYPE_SLTI: begin
-            // Set less than immediate
-            o_alu_control_signals = SLT;
-        end
-        I_TYPE_SLTIU: begin
-            // Set less than immediate unsigned
-            o_alu_control_signals = SLTU;
-        end
-        BRANCH: begin
-            // Branch operations typically use subtraction for comparison
-            o_alu_control_signals = SUB;
-        end
-        default: begin
-            // Default to addition if no match
-            o_alu_control_signals = ADD;
-        end
-    endcase
+    if (i_alu_op_CU === 4'bx || i_op_r_tipe === 6'bx) begin
+        o_alu_control_signals = ADD;  // Valor por defecto para evitar indefinidos
+    end else begin
+        case (i_alu_op_CU)
+            R_TYPE: begin
+                // Directly pass the function code for R-type instructions
+                o_alu_control_signals = i_op_r_tipe; 
+            end
+            LOAD_STORE: begin
+                // Load/Store operations perform addition
+                o_alu_control_signals = ADD;
+            end
+            I_TYPE_ADDIU: begin
+                // Immediate addition
+                o_alu_control_signals = ADDU;
+            end
+            I_TYPE_ANDI: begin
+                // AND immediate
+                o_alu_control_signals = AND;
+            end
+            I_TYPE_ORI: begin
+                // OR immediate
+                o_alu_control_signals = OR;
+            end
+            I_TYPE_XORI: begin
+                // XOR immediate
+                o_alu_control_signals = XOR;
+            end
+            I_TYPE_LUI: begin
+                // Load upper immediate
+                o_alu_control_signals = LUI;
+            end
+            I_TYPE_SLTI: begin
+                // Set less than immediate
+                o_alu_control_signals = SLT;
+            end
+            I_TYPE_SLTIU: begin
+                // Set less than immediate unsigned
+                o_alu_control_signals = SLTU;
+            end
+            BRANCH: begin
+                // Branch operations typically use subtraction for comparison
+                o_alu_control_signals = SUB;
+            end
+            default: begin
+                // Default to addition if no match
+                o_alu_control_signals = ADD;
+            end
+        endcase
+    end
 end
 
 endmodule

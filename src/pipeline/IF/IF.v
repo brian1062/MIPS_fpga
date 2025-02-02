@@ -51,9 +51,9 @@ module IF
     input                   i_JSel,         // Selector for jump address
     input                   i_PCWrite,      // Write enable for PC
     input                   i_dunit_reset_pc,
-    input  [NB_REG-1:0]     i_inmed,        // Immediate value for jump/branch
+    input  [NB_REG-1:0]     i_inmed,        // Immediate value for jump/branch  from ID
     input  [NB_INST-1:0]    i_inst_to_mxp,  // Instruction bits for concatenation
-    input  [NB_REG-1:0]     i_pc_jsel,      // PC value for jump select
+    input  [NB_REG-1:0]     i_pc_jsel,      // PC value for jump select         from ID
     input  [NB_REG-1:0]     i_dunit_data,   // debug for instruction memory write
     output [NB_REG-1:0]     o_pcplus4,      // Calculated PC+4
     output [NB_REG-1:0]     o_instruction   // Instruction fetched from memory
