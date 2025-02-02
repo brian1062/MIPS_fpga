@@ -1,15 +1,18 @@
 module hazard_unit 
+#(
+    parameter NB_ADDR = 5 
+)
 (
-    input  i_jump       ,
-    input  i_branch     ,
+    input                i_jump       ,
+    input                i_branch     ,
 
-    input  i_rs_id      ,
-    input  i_rt_id      ,
-    input  i_rt_ex      ,
-    input  i_mem_read_ex,  
+    input [NB_ADDR-1:0]  i_rs_id      ,
+    input [NB_ADDR-1:0]  i_rt_id      ,
+    input [NB_ADDR-1:0]  i_rt_ex      ,
+    input                i_mem_read_ex,  
 
-    output o_flush      ,
-    output o_stall
+    output               o_flush      ,
+    output               o_stall
 );
 
 //read load data hazard

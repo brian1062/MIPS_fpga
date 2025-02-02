@@ -180,7 +180,9 @@ control_unit #(
     .o_signals      (w_signals_from_controlU)
 );
 //hazard unit
-hazard_unit u_hazard_unit(
+hazard_unit #(
+    .NB_ADDR  (NB_ADDR)
+)u_hazard_unit(
     .i_jump       (w_signals_from_controlU[19]),
     .i_branch     (w_PCSrc), //ojo aca dice branch pero es branch tomado
     .i_rs_id      (w_intruction_if_id[25:21]),
