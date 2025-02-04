@@ -334,18 +334,18 @@ module tb_pipeline;
         // // ----------- Riesgo de Control (BEQ) -----------
 
         // // 1. ADDI: Guardar 1 en $6 de la memoria de registros
-        // i_dunit_addr = 32'h0000_00B0; 
-        // i_dunit_data_if = 32'b001000_00000_00110_00000_00000_000001; // ADDI $6, $0, 1  ($6 = 1)
-        // #10;
+        i_dunit_addr = 32'h0000_00B0; 
+        i_dunit_data_if = 32'b001000_00000_00110_00000_00000_000001; // ADDI $6, $0, 1  ($6 = 1)
+        #10;
 
         // // 2. ADDI: Guardar 1 en $7 de la memoria de registros
-        // i_dunit_addr = 32'h0000_00B4; 
-        // i_dunit_data_if = 32'b001000_00000_00111_00000_00000_000001; // ADDI $7, $0, 1  ($7 = 1)
-        // #10;
+        i_dunit_addr = 32'h0000_00B4; 
+        i_dunit_data_if = 32'b001000_00000_00111_00000_00000_000001; // ADDI $7, $0, 1  ($7 = 1)
+        #10;
 
-        // i_dunit_addr = 32'h0000_00B8; 
-        // i_dunit_data_if = 32'b000100_00110_00111_00000_00000_000010; // BEQ $6, $7, salto (si $6 == $7, salta a "salto")
-        // #10;
+        i_dunit_addr = 32'h0000_00c4; 
+        i_dunit_data_if = 32'b000100_00110_00111_00000_00000_001000; // BEQ $6, $7, salto (si $6 == $7, salta a "salto")
+        #10;
 
         // i_dunit_addr = 32'h0000_00BC; 
         // i_dunit_data_if = 32'b001000_00000_01000_00000_00000_000011; // ADDI $8, $0, 3  ($8 = 3) - Instrucción después del salto
@@ -747,7 +747,7 @@ module tb_pipeline;
         // #10
 
         // End simulation
-        #200;
+        #600;
         $stop;
     end
 endmodule

@@ -158,6 +158,6 @@ set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 set_property BITSTREAM.CONFIG.CONFIGRATE 33 [current_design]
 set_property CONFIG_MODE SPIx4 [current_design]
 
-set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets {u_pipeline/uu_ID/pc_reg[31]}]
+# set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets {u_pipeline/uu_ID/pc_reg[31]}]
 
-set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets {u_pipeline/uu_ID/inst_mem_reg_reg[29]}]
+# set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets {u_pipeline/uu_ID/inst_mem_reg_reg[29]}]

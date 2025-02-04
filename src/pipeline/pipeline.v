@@ -102,7 +102,7 @@ IF #(
     .i_Jump         (w_signals_from_controlU[19]),         // Jump signal
     .i_JSel         (w_signals_from_controlU[18]),         // Selector for jump address
     .i_PCWrite      (!w_stall | !w_signals_from_controlU[0]),      // Write enable for PC
-    .i_dunit_reset_pc(i_dunit_reset_pc),
+    .i_dunit_reset_pc(i_dunit_reset_pc),//TODO SACAR NO LO NECESITE
     .i_inmed        (w_branch_target),        // Immediate value for jump/branch
     .i_inst_to_mxp  (w_intruction_if_id[25:0]),  // Instruction bits for concatenation
     .i_pc_jsel      (w_pc_jsel_id_to_if),      // PC value for jump select
@@ -120,7 +120,7 @@ IF_ID #(
     .i_dunit_clk_en (i_dunit_clk_en),
     .i_pc_four      (w_pcplus4_if_to_ifid),
     .i_data_ins_mem (w_intruction_if),
-    .i_flush        (w_flush),   // en 1 flush = reset register
+    // .i_flush        (w_flush),   // en 1 flush = reset register
     .i_write        (!w_stall),   //TODO:VERS SI FUNCIONA EL ~ EN 0 STALL mantengo valor anteriores esto debo conectarlo al pc tmb T
     .o_pc_four      (w_pc4_ifid_id),
     .o_data_ins_mem (w_intruction_if_id)
@@ -174,7 +174,7 @@ control_unit #(
     .NB_SGN    (20),
     .NB_OP     (NB_OP)
 ) uu_control_unit(
-    .i_enable       (!w_flush) , //TODO: VER SI TOMA BIEN EL NEGADO
+    .i_enable       (1'b1),//!w_flush) , //TODO: VER SI TOMA BIEN EL NEGADO
     .i_inst_opcode  (w_intruction_if_id[31:26]) ,   //instruction [31:26]
     .i_inst_function(w_intruction_if_id[5:0]) ,   //instruction [5:0]
     .o_signals      (w_signals_from_controlU)
@@ -214,7 +214,7 @@ ID_EX #(
     .NB_ADDR  (NB_ADDR)
 ) u_ID_EX(
     .i_clk           (i_clk),
-    .i_reset         (i_reset),
+    .i_reset         (i_reset | w_flush),
     .i_dunit_clk_en  (i_dunit_clk_en),
     .i_pc_eight      (w_pc8_id_idex),
     .i_rs_data       (w_rs_data_id_idex),
