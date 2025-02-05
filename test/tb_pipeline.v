@@ -346,7 +346,10 @@ module tb_pipeline;
         i_dunit_addr = 32'h0000_00c4; 
         i_dunit_data_if = 32'b000100_00110_00111_00000_00000_001000; // BEQ $6, $7, salto (si $6 == $7, salta a "salto")
         #10;
-
+        
+        i_dunit_addr = 32'h0000_00ec;
+        i_dunit_data_if = 32'b000000_00000_00000_00000_00000_111111;//halt
+        #10;
         // i_dunit_addr = 32'h0000_00BC; 
         // i_dunit_data_if = 32'b001000_00000_01000_00000_00000_000011; // ADDI $8, $0, 3  ($8 = 3) - Instrucción después del salto
         // #10;

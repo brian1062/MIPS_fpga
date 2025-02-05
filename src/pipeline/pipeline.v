@@ -101,7 +101,7 @@ IF #(
     .i_PCSrc        (w_PCSrc),        // Selector for PC source
     .i_Jump         (w_signals_from_controlU[19]),         // Jump signal
     .i_JSel         (w_signals_from_controlU[18]),         // Selector for jump address
-    .i_PCWrite      (!w_stall | !w_signals_from_controlU[0]),      // Write enable for PC
+    .i_PCWrite      (!w_stall & !w_signals_from_controlU[0]),      // Write enable for PC
     .i_dunit_reset_pc(i_dunit_reset_pc),//TODO SACAR NO LO NECESITE
     .i_inmed        (w_branch_target),        // Immediate value for jump/branch
     .i_inst_to_mxp  (w_intruction_if_id[25:0]),  // Instruction bits for concatenation
@@ -121,7 +121,7 @@ IF_ID #(
     .i_pc_four      (w_pcplus4_if_to_ifid),
     .i_data_ins_mem (w_intruction_if),
     // .i_flush        (w_flush),   // en 1 flush = reset register
-    .i_write        (!w_stall),   //TODO:VERS SI FUNCIONA EL ~ EN 0 STALL mantengo valor anteriores esto debo conectarlo al pc tmb T
+    .i_write        (!w_stall & !w_signals_from_controlU[0]),   //TODO:VERS SI FUNCIONA EL ~ EN 0 STALL mantengo valor anteriores esto debo conectarlo al pc tmb T
     .o_pc_four      (w_pc4_ifid_id),
     .o_data_ins_mem (w_intruction_if_id)
 
