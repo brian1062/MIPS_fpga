@@ -101,7 +101,7 @@ IF #(
     .i_PCSrc        (w_PCSrc),        // Selector for PC source
     .i_Jump         (w_signals_from_controlU[19]),         // Jump signal
     .i_JSel         (w_signals_from_controlU[18]),         // Selector for jump address
-    .i_PCWrite      (!w_stall & !w_signals_from_controlU[0]),      // Write enable for PC
+    .i_PCWrite      (!w_stall & !w_signals_from_controlU[0] ),//& !w_flush),      // Write enable for PC aca hace un stall pc
     .i_dunit_reset_pc(i_dunit_reset_pc),//TODO SACAR NO LO NECESITE
     .i_inmed        (w_branch_target),        // Immediate value for jump/branch
     .i_inst_to_mxp  (w_intruction_if_id[25:0]),  // Instruction bits for concatenation
@@ -116,8 +116,8 @@ IF_ID #(
     .NB_REG (NB_REG)
 ) uu_IF_ID(
     .i_clk          (i_clk),
-    .i_reset        (i_reset),   //add | jump o ver
-    .i_dunit_clk_en (i_dunit_clk_en),
+    .i_reset        (i_reset | w_signals_from_controlU[19] | w_signals_from_controlU[18] | w_PCSrc),   //add | jump o ver
+    .i_dunit_clk_en (i_dunit_clk_en ),//& !w_flush),
     .i_pc_four      (w_pcplus4_if_to_ifid),
     .i_data_ins_mem (w_intruction_if),
     // .i_flush        (w_flush),   // en 1 flush = reset register
@@ -214,7 +214,7 @@ ID_EX #(
     .NB_ADDR  (NB_ADDR)
 ) u_ID_EX(
     .i_clk           (i_clk),
-    .i_reset         (i_reset | w_flush),
+    .i_reset         (i_reset | w_signals_from_controlU[19]),//| w_flush ),
     .i_dunit_clk_en  (i_dunit_clk_en),
     .i_pc_eight      (w_pc8_id_idex),
     .i_rs_data       (w_rs_data_id_idex),
