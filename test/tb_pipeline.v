@@ -64,6 +64,12 @@ module tb_pipeline;
         i_dunit_w_en=1;
 
         // ----------- Operaciones -----------
+        // ADDI: No debe ejecutarse (está después del salto)
+        i_dunit_addr = 32'h0000_0000;
+        i_dunit_data_if = 32'b001000_00000_00110_00000_00000_001011; // ADDI $6, $0, 10
+        //Accion esperada: No se ejecuta
+        #10;
+        
 
         // JUMP incondicional: Salto a 0x40
         i_dunit_addr = 32'h0000_0004;
@@ -77,6 +83,13 @@ module tb_pipeline;
         //Accion esperada: No se ejecuta
         #10;
 
+        i_dunit_addr = 32'h0000_0040;
+        i_dunit_data_if = 32'b001000_00000_00111_00000_00000_001100; // ADDI $7, $0, 11
+        #10;
+        i_dunit_addr = 32'h0000_0050;
+        i_dunit_data_if = 32'b101011_00000_001110000000000000000;  // sw  $0, 0x0($0)
+        #10;
+        
         // JAL: Salto a 0x50 y guarda PC+4 en $31
         //i_dunit_addr = 32'h0000_0040;
         //i_dunit_data_if = 32'b000011_00000_00000_00000_00000_010100; // JAL 0x50
@@ -86,6 +99,7 @@ module tb_pipeline;
         i_dunit_w_en = 0;
         i_dunit_reset_pc = 0;
         i_dunit_clk_en = 1;
+        i_dunit_addr = 0;
 
         // ------------------ Monitoreo del Pipeline ------------------
         

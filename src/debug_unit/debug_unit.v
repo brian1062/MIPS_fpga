@@ -219,10 +219,12 @@ always @(*) begin
                 if (counter[1:0] == 2'b11) 
                 begin
                     next_counter = 0;
-                    next_addr_inst = addr_inst +1;
                     if (addr_inst == 31) begin
                         next_addr_inst = 0;
                         next_state = SEND_M;
+                    end
+                    else begin
+                        next_addr_inst = addr_inst +1;
                     end
                 end
             end
@@ -250,18 +252,18 @@ always @(*) begin
         //TODO: SEND IF_ID ID_EX EX_M M_WB
         RETURN:
         begin
-            // if(fifo_tx_full)begin
-            //     next_state = WAIT_TX;
-            //     next_waiting_state = RETURN;
-            // end
-            // else begin
-            if(step_mode) begin
-                next_state = IDLE;
+            if(fifo_tx_full)begin
+                next_state = WAIT_TX;
+                next_waiting_state = RETURN;
             end
             else begin
-                next_state = RESET;
+                if(step_mode) begin
+                    next_state = IDLE;
+                end
+                else begin
+                    next_state = RESET;
+                end
             end
-            // end
         end
 
         RESET:
@@ -302,7 +304,7 @@ always @(*) begin
         enable = 1'b0;
         reset = 1'b0;
     end
-    IDLE, WAIT_RX, WAIT_TX, RETURN:
+    IDLE, WAIT_RX, WAIT_TX:
     begin
         rd_reg = 1'b0;
         wr_reg = 1'b0;
@@ -318,7 +320,15 @@ always @(*) begin
         enable = 1'b1;
         reset = 1'b0;
     end
-    SEND, SEND_M, SEND_REG:
+    SEND:
+    begin
+        rd_reg = 1'b0;
+        wr_reg = 1'b0;
+        write_mem = 1'b0;
+        enable = 1'b0;
+        reset = 1'b0;
+    end
+    SEND_M, SEND_REG, RETURN:
     begin
         rd_reg = 1'b0;
         wr_reg = 1'b1;
@@ -329,7 +339,7 @@ always @(*) begin
     RESET:
     begin
         rd_reg = 1'b0;
-        wr_reg = 1'b1;
+        wr_reg = 1'b0;
         write_mem = 1'b0;
         enable = 1'b0;
         reset = 1'b1;
