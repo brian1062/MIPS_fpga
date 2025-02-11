@@ -69,7 +69,7 @@ localparam HALT_CODE    = 32'h3f;
 
 
 //! var
-reg [NB_REG-1:0] counter  , next_counter  ;
+reg [1:0] counter  , next_counter  ;
 reg [DBIT-1:0] state    , next_state    ;
 reg [DBIT-1:0] waiting_state , next_waiting_state;
 reg step_mode, next_step_mode;
@@ -82,7 +82,7 @@ always @(posedge i_clk) begin : update_regs
     if (i_reset) begin
         state <= IDLE;
         waiting_state <= IDLE;
-        counter <= 0;
+        counter <= 2'b00;
         step_mode <= 1'b0;
         inst_to_mem <= 0;
         addr_inst <= 0;
@@ -216,9 +216,9 @@ always @(*) begin
             else begin
                 next_data_to_tx = i_reg_data[(31-counter[1:0]*8)-:8];
                 next_counter = counter +1;
+
                 if (counter[1:0] == 2'b11) 
                 begin
-                    next_counter = 0;
                     if (addr_inst == 31) begin
                         next_addr_inst = 0;
                         next_state = SEND_M;
@@ -242,7 +242,7 @@ always @(*) begin
                 begin
                     next_counter = 0;
                     next_addr_inst = addr_inst +4; // en data va de a 4
-                    if (addr_inst == 124) begin
+                    if (addr_inst[6:0] == 7'b1111100) begin //1111100
                         next_addr_inst = 0;
                         next_state = RETURN;
                     end
