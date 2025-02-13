@@ -5,6 +5,10 @@ module tb_pipeline;
     parameter NB_WIDHT = 9;
     parameter NB_OP    = 6;
     parameter NB_ADDR  = 5;
+    parameter NB_IFID =64 ;
+    parameter NB_IDEX =144;
+    parameter NB_EXM  =88 ;
+    parameter NB_MWB  =80 ;
 
     // Testbench Signals
     reg                   i_clk;
@@ -13,10 +17,15 @@ module tb_pipeline;
     reg                   i_dunit_reset_pc;
     reg                   i_dunit_w_en;
     reg                   i_dunit_r_data;
-    reg [NB_REG-1:0]    i_dunit_addr;
-    reg [NB_REG-1:0]      i_dunit_data_if;
+    reg  [NB_REG-1:0]     i_dunit_addr    ;
+    reg  [NB_REG-1:0]     i_dunit_data_if ;
     wire [NB_REG-1:0]     o_dunit_mem_data;
-    wire [NB_REG-1:0]     o_dunit_reg;
+    wire [NB_REG-1:0]     o_dunit_reg     ;
+    wire [NB_IFID-1:0]    o_IF_ID         ;
+    wire [NB_IDEX-1:0]    o_ID_EX         ;
+    wire [NB_EXM -1:0]    o_EX_M          ;
+    wire [NB_MWB -1:0]    o_M_WB          ;
+    wire                  o_halt          ;
 
     // Clock Generation
     initial begin
@@ -40,7 +49,12 @@ module tb_pipeline;
         .i_dunit_addr(i_dunit_addr),
         .i_dunit_data_if(i_dunit_data_if),
         .o_dunit_reg(o_dunit_reg),
-        .o_dunit_mem_data(o_dunit_mem_data)
+        .o_dunit_mem_data(o_dunit_mem_data),
+        .o_IF_ID         (o_IF_ID),
+        .o_ID_EX         (o_ID_EX),
+        .o_EX_M          (o_EX_M),
+        .o_M_WB          (o_M_WB),
+        .o_halt          (o_halt)
     );
 
     integer i;
@@ -87,7 +101,7 @@ module tb_pipeline;
         i_dunit_data_if = 32'b001000_00000_00111_00000_00000_001100; // ADDI $7, $0, 11
         #10;
         i_dunit_addr = 32'h0000_0050;
-        i_dunit_data_if = 32'b101011_00000_001110000000000000000;  // sw  $0, 0x0($0)
+        i_dunit_data_if = 32'b10101100000001100000000001111100;  // sw  $6, 0x0($0)
         #10;
         
         // JAL: Salto a 0x50 y guarda PC+4 en $31
@@ -99,7 +113,7 @@ module tb_pipeline;
         i_dunit_w_en = 0;
         i_dunit_reset_pc = 0;
         i_dunit_clk_en = 1;
-        i_dunit_addr = 0;
+        i_dunit_addr = 32'b00000000000000000000000001111100;
 
         // ------------------ Monitoreo del Pipeline ------------------
         

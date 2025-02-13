@@ -1,8 +1,12 @@
 module pipeline #(
-    parameter NB_REG  =32,
-    parameter NB_WIDHT=9 , // for widht addr in instruction memory or datamemory
-    parameter NB_OP   =6 ,
-    parameter NB_ADDR =5  //for addr -> rs ,rt ..
+    parameter NB_REG  =32 ,
+    parameter NB_WIDHT=9  , // for widht addr in instruction memory or datamemory
+    parameter NB_OP   =6  ,
+    parameter NB_ADDR =5  , //for addr -> rs ,rt ..
+    parameter NB_IFID =64 ,
+    parameter NB_IDEX =144,
+    parameter NB_EXM  =88 ,
+    parameter NB_MWB  =80   
 ) 
 (
     input               i_clk           ,
@@ -11,12 +15,16 @@ module pipeline #(
     input               i_dunit_clk_en  ,
     input               i_dunit_reset_pc,
     input               i_dunit_w_mem   ,       //write in instruction memory
-    input [NB_REG-1:0]  i_dunit_addr,           //ADDR TO instruction memory, REGISTER MEMORY and datamemory
-    input [NB_REG-1:0]  i_dunit_data_if,        //instruction memory
+    input [NB_REG-1:0]  i_dunit_addr    ,       //ADDR TO instruction memory, REGISTER MEMORY and datamemory
+    input [NB_REG-1:0]  i_dunit_data_if ,       //instruction memory
     
     output[NB_REG-1:0]  o_dunit_reg     ,       //registermemory TO DEBUG UNIT  
     output[NB_REG-1:0]  o_dunit_mem_data,       //datamemory TO DEBUG UNIT
-    output              o_halt
+    output[NB_IFID-1:0] o_IF_ID         ,
+    output[NB_IDEX-1:0] o_ID_EX         ,
+    output[NB_EXM -1:0] o_EX_M          ,
+    output[NB_MWB -1:0] o_M_WB          ,
+    output              o_halt          
 
 
 );
@@ -360,5 +368,27 @@ WB #(
     .o_data_to_reg   (w_data_to_reg_wb)     // Data to be written to register file
 );
 
-    
+//ASSIGN intermediate reg
+assign o_IF_ID = {w_intruction_if_id, w_pc4_ifid_id}; //32 ,32 = 64
+
+assign o_ID_EX = {w_rs_data_idex_ex, 
+                  w_rt_data_idex_ex, 
+                  w_sign_ext_idex_ex, 
+                  2'b00  ,w_op_idex_ex,
+                  3'b000 ,w_rs_addr_idex_ex, 
+                  3'b000 , w_rt_addr_idex_ex, 
+                  3'b000 , w_rd_addr_idex_ex,
+                  w_controlU_idex_ex         }; //32, 32, 32, 8, 8, 8, 8, 16 = 144
+
+assign o_EX_M = {w_alu_result_exm_m, 
+                 w_write_data_exm_m, 
+                 3'b000, w_data_addr_exm_mwb, 
+                 7'b000, w_controlU_exm_m}; //32, 32, 8, 16 = 88
+
+assign o_M_WB = {w_read_data_mwb_wb,
+                 w_alu_result_mwb_wb, 
+                 3'b000 ,w_data_addr_from_mwb, 
+                 4'b0000,w_controlU_mwb_wb}; //32, 32, 8, 8 = 80
+
+
 endmodule

@@ -1,6 +1,7 @@
 module debug_unit 
 #(
     parameter NB_REG  = 32,
+    parameter NB_R_INT=376,
     parameter DBIT    = 8 ,
     parameter SB_TICK = 16,
     parameter DVSR    = 326,
@@ -12,8 +13,9 @@ module debug_unit
     input               i_reset     ,
 
     input               i_rx        ,
-    input [NB_REG-1:0] i_reg_data  ,
-    input [NB_REG-1:0] i_mem_data  ,
+    input [NB_REG-1:0] i_reg_data   ,
+    input [NB_REG-1:0] i_mem_data   ,
+    input [NB_R_INT-1:0]i_reg_int   , 
     input               i_halt      ,
 
     output              o_tx        ,
@@ -60,6 +62,7 @@ localparam STEP         = 8'b0000_0101;
 localparam SEND         = 8'b0000_0110;
 localparam SEND_M       = 8'b0000_0111;
 localparam SEND_REG     = 8'b0000_1000;
+localparam SEND_REG_INT = 8'b0000_1110;
 localparam WAIT_RX      = 8'b0000_1001;
 localparam WAIT_TX      = 8'b0000_1010;
 localparam WRITE_INST   = 8'b0000_1011;
@@ -244,12 +247,27 @@ always @(*) begin
                     next_addr_inst = addr_inst +4; // en data va de a 4
                     if (addr_inst[6:0] == 7'b1111100) begin //1111100
                         next_addr_inst = 0;
-                        next_state = RETURN;
+                        next_state = SEND_REG_INT;
                     end
                 end
             end   
         end
-        //TODO: SEND IF_ID ID_EX EX_M M_WB
+        SEND_REG_INT:
+        begin
+            if(fifo_tx_full)begin
+                next_state = WAIT_TX;
+                next_waiting_state = SEND_REG_INT;
+            end
+            else begin
+                next_data_to_tx = i_reg_int[(375-addr_inst*8)-:8];//prueba usar el addr como contador, para no crear otro
+                next_addr_inst = addr_inst +1;
+                if (addr_inst == 46) begin
+                    next_addr_inst = 0;
+                    next_state = RETURN;
+                end
+            end
+        end
+
         RETURN:
         begin
             if(fifo_tx_full)begin
@@ -328,7 +346,7 @@ always @(*) begin
         enable = 1'b0;
         reset = 1'b0;
     end
-    SEND_M, SEND_REG, RETURN:
+    SEND_M, SEND_REG, SEND_REG_INT, RETURN:
     begin
         rd_reg = 1'b0;
         wr_reg = 1'b1;

@@ -22,6 +22,8 @@ HALT_INSTR = 0x0000003F
 # Número total de bytes que se esperan como respuesta:
 # 32 registros (32 x 32 bits = 128 bytes) + 128 posiciones de memoria (128 x 8 bits = 128 bytes)
 EXPECTED_RESPONSE_BYTES = 256
+# Número de bytes de los registros de pipeline (IF_ID + ID_EX + EX_M + M_WB)
+PIPELINE_BYTES = 47
 
 def parse_coe(filename):
     """
@@ -97,6 +99,100 @@ def mostrar_registros_memoria(data):
             print("Mem[{:02d}]: 0x{:08X}".format(i, mem_word))
     print("-----------------------------\n")
 
+def print_field(label, value, bits):
+    """
+    Imprime un campo con su etiqueta, valor en hexadecimal y en binario.
+    Se formatea el valor hexadecimal con un ancho fijo (10 caracteres) para que la
+    columna de la parte binaria quede alineada.
+    
+    :param label: etiqueta del campo (string)
+    :param value: valor numérico del campo
+    :param bits: cantidad de bits del campo (por ejemplo, 32, 16 o 8)
+    """
+    hex_width = bits // 4    # cantidad de dígitos hexadecimales sin contar "0x"
+    bin_width = bits         # el ancho en binario es igual a la cantidad de bits
+    hex_str = format(value, '0{}X'.format(hex_width))
+    bin_str = format(value, '0{}b'.format(bin_width))
+    hex_field = f"0x{hex_str}"
+    # Formateamos el campo hexadecimal a un ancho fijo de 10 caracteres
+    print(f"{label:<12}: {hex_field:<10}   {bin_str:>{bin_width}}")
+
+
+def mostrar_pipeline(data):
+    """
+    Procesa los 47 bytes de datos de pipeline, que están organizados de la siguiente forma:
+      IF_ID:  inst (32 bits), pc+4 (32 bits)       -> 8 bytes
+      ID_EX:  rs_data (32 bits), rt_data (32 bits), immediate (32 bits),
+              op_code (8 bits), rs_addr (8 bits), rt_addr (8 bits),
+              rd_addr (8 bits), controlU (16 bits)    -> 18 bytes
+      EX_M:   alu_result (32 bits), wr_data (32 bits), addr_rd (8 bits), controlU (16 bits) -> 11 bytes
+      M_WB:   read_data (32 bits), alu_result (32 bits), addr_rd (8 bits), controlU (8 bits)   -> 10 bytes
+    Se muestra la información en un formato tabulado para facilitar la lectura.
+    """
+    if len(data) < PIPELINE_BYTES:
+        print("Datos incompletos recibidos (pipeline).")
+        return
+
+    # Parseo de IF_ID
+    if_id = data[0:8]
+    if_id_inst = int.from_bytes(if_id[0:4], byteorder='big')
+    if_id_pc = int.from_bytes(if_id[4:8], byteorder='big')
+    
+    # Parseo de ID_EX
+    id_ex = data[8:26]
+    id_ex_rs_data   = int.from_bytes(id_ex[0:4], byteorder='big')
+    id_ex_rt_data   = int.from_bytes(id_ex[4:8], byteorder='big')
+    id_ex_immediate = int.from_bytes(id_ex[8:12], byteorder='big')
+    id_ex_op_code   = id_ex[12]
+    id_ex_rs_addr   = id_ex[13]
+    id_ex_rt_addr   = id_ex[14]
+    id_ex_rd_addr   = id_ex[15]
+    id_ex_controlU  = int.from_bytes(id_ex[16:18], byteorder='big')
+    
+    # Parseo de EX_M
+    ex_m = data[26:37]
+    ex_m_alu_result = int.from_bytes(ex_m[0:4], byteorder='big')
+    ex_m_wr_data    = int.from_bytes(ex_m[4:8], byteorder='big')
+    ex_m_addr_rd    = ex_m[8]
+    ex_m_controlU   = int.from_bytes(ex_m[9:11], byteorder='big')
+    
+    # Parseo de M_WB
+    m_wb = data[37:47]
+    m_wb_read_data   = int.from_bytes(m_wb[0:4], byteorder='big')
+    m_wb_alu_result  = int.from_bytes(m_wb[4:8], byteorder='big')
+    m_wb_addr_rd     = m_wb[8]
+    m_wb_controlU    = m_wb[9]
+    
+
+    print("\n----- PIPELINE REGISTERS -----")
+    print("IF_ID:")
+    print_field("inst", if_id_inst, 32)
+    print_field("pc+4", if_id_pc, 32)
+    print("")
+    print("ID_EX:")
+    print_field("rs_data", id_ex_rs_data, 32)
+    print_field("rt_data", id_ex_rt_data, 32)
+    print_field("immediate", id_ex_immediate, 32)
+    print_field("op_code", id_ex_op_code & 0x3F, 6)
+    print_field("rs_addr", id_ex_rs_addr & 0x1F, 5)
+    print_field("rt_addr", id_ex_rt_addr & 0x1F, 5)
+    print_field("rd_addr", id_ex_rd_addr & 0x1F, 5)
+    print_field("controlU", id_ex_controlU, 16)
+    print("")
+    print("EX_M:")
+    print_field("alu_result", ex_m_alu_result, 32)
+    print_field("wr_data", ex_m_wr_data, 32)
+    print_field("addr_rd", ex_m_addr_rd & 0x1F, 5)
+    print_field("controlU", ex_m_controlU & 0x1FF, 9)
+    print("")
+    print("M_WB:")
+    print_field("read_data", m_wb_read_data, 32)
+    print_field("alu_result", m_wb_alu_result, 32)
+    print_field("addr_rd", m_wb_addr_rd & 0x1F, 5)
+    print_field("controlU", m_wb_controlU & 0xF, 4)
+    print("------------------------------\n")
+
+
 def signal_handler(sig, frame, ser):
     print("\nSe recibió SIGINT. Cerrando puerto serie y saliendo.")
     ser.close()
@@ -166,14 +262,18 @@ def main():
             enviar_datos(ser, bytes([CMD_RUN]))
             print("Esperando respuesta de la FPGA (registros y memoria)...")
             data = leer_respuesta(ser, EXPECTED_RESPONSE_BYTES)
+            regs = leer_respuesta(ser, PIPELINE_BYTES)
             mostrar_registros_memoria(data)
+            mostrar_pipeline(regs)
         
         elif opcion == '3':
             print("Enviando comando STEP (0x05)...")
             enviar_datos(ser, bytes([CMD_STEP]))
             print("Esperando respuesta de la FPGA (registros y memoria)...")
             data = leer_respuesta(ser, EXPECTED_RESPONSE_BYTES)
+            regs = leer_respuesta(ser, PIPELINE_BYTES)
             mostrar_registros_memoria(data)
+            mostrar_pipeline(regs)
         
         elif opcion == '4':
             print("Enviando comando RESET (0x0C)...")
