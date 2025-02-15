@@ -124,11 +124,10 @@ IF_ID #(
     .NB_REG (NB_REG)
 ) uu_IF_ID(
     .i_clk          (i_clk),
-    .i_reset        (i_reset | w_signals_from_controlU[19] | w_signals_from_controlU[18] | w_PCSrc),   //add | jump o ver
-    .i_dunit_clk_en (i_dunit_clk_en ),//& !w_flush),
+    .i_reset        (i_reset | w_signals_from_controlU[19] | w_signals_from_controlU[18] | w_PCSrc),   //flush si el salto es tomado
+    .i_dunit_clk_en (i_dunit_clk_en ),
     .i_pc_four      (w_pcplus4_if_to_ifid),
     .i_data_ins_mem (w_intruction_if),
-    // .i_flush        (w_flush),   // en 1 flush = reset register
     .i_write        (!w_stall & !w_signals_from_controlU[0]),   //TODO:VERS SI FUNCIONA EL ~ EN 0 STALL mantengo valor anteriores esto debo conectarlo al pc tmb T
     .o_pc_four      (w_pc4_ifid_id),
     .o_data_ins_mem (w_intruction_if_id)
@@ -182,7 +181,7 @@ control_unit #(
     .NB_SGN    (20),
     .NB_OP     (NB_OP)
 ) uu_control_unit(
-    .i_enable       (1'b1),//!w_flush) , //TODO: VER SI TOMA BIEN EL NEGADO
+    .i_enable       (1'b1),
     .i_inst_opcode  (w_intruction_if_id[31:26]) ,   //instruction [31:26]
     .i_inst_function(w_intruction_if_id[5:0]) ,   //instruction [5:0]
     .o_signals      (w_signals_from_controlU)
@@ -191,13 +190,16 @@ control_unit #(
 hazard_unit #(
     .NB_ADDR  (NB_ADDR)
 )u_hazard_unit(
-    .i_jump       (w_signals_from_controlU[19]),
-    .i_branch     (w_PCSrc), //ojo aca dice branch pero es branch tomado
+    .i_branch     (w_signals_from_controlU[17]),
     .i_rs_id      (w_intruction_if_id[25:21]),
     .i_rt_id      (w_intruction_if_id[20:16]),
     .i_rt_ex      (w_rt_addr_idex_ex),
-    .i_mem_read_ex(w_controlU_idex_ex[8]),  
-    .o_flush      (w_flush),
+    .i_rd_ex      (w_data_addr_ex_exm),
+    .i_rd_mem     (w_data_addr_exm_mwb),
+    .i_mem_read_ex(w_controlU_idex_ex[8]),
+    .i_regwrite_ex(w_controlU_idex_ex[2]),
+    .i_memtoreg_m (w_controlU_exm_m[3]),  
+    .o_flush_idex (w_flush),
     .o_stall      (w_stall) //w_signals_from_controlU[0]=halt agregar
 );
 
@@ -222,7 +224,7 @@ ID_EX #(
     .NB_ADDR  (NB_ADDR)
 ) u_ID_EX(
     .i_clk           (i_clk),
-    .i_reset         (i_reset | w_signals_from_controlU[19]),//| w_flush ),
+    .i_reset         (i_reset | w_flush),//,w_signals_from_controlU[19]),
     .i_dunit_clk_en  (i_dunit_clk_en),
     .i_pc_eight      (w_pc8_id_idex),
     .i_rs_data       (w_rs_data_id_idex),

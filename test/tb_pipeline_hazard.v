@@ -66,21 +66,21 @@ module tb_pipeline_hazard;
         //----------- Riesgo de Datos -----------
 
         // 1. ADDI: Guardar 1 en $3 de la memoria de registros
-        i_dunit_addr = 32'h0000_0004; 
-        i_dunit_data_if = 32'b001000_00000_00011_00000_00000_000001; // ADDI $3, $0, 1  ($3 = 1)
-        // Acción esperada: $3 = 1
-        #10;
+        // i_dunit_addr = 32'h0000_0004; 
+        // i_dunit_data_if = 32'b001000_00000_00011_00000_00000_000001; // ADDI $3, $0, 1  ($3 = 1)
+        // // Acción esperada: $3 = 1
+        // #10;
         
-        // 2. ADDI: Guardar 2+$3 en $4 de la memoria de registros
-        i_dunit_addr = 32'h0000_0008; 
-        i_dunit_data_if = 32'b001000_00011_00100_00000_00000_000010; // ADDI $4, $3, 2  ($4 = $3 + 2)
-        // Acción esperada: $4 = 3
-        #10;
+        // // 2. ADDI: Guardar 2+$3 en $4 de la memoria de registros
+        // i_dunit_addr = 32'h0000_0008; 
+        // i_dunit_data_if = 32'b001000_00011_00100_00000_00000_000010; // ADDI $4, $3, 2  ($4 = $3 + 2)
+        // // Acción esperada: $4 = 3
+        // #10;
 
-        // 3. ADDI: Guardar 3+$4 en $5 de la memoria de registros
-        i_dunit_addr = 32'h0000_000C;
-        i_dunit_data_if = 32'b001000_00100_00101_00000_00000_000011; // ADDI $5, $4, 3  ($5 = $4 + 3)
-        #10;
+        // // 3. ADDI: Guardar 3+$4 en $5 de la memoria de registros
+        // i_dunit_addr = 32'h0000_000C;
+        // i_dunit_data_if = 32'b001000_00100_00101_00000_00000_000011; // ADDI $5, $4, 3  ($5 = $4 + 3)
+        // #10;
 
         // ----------- Riesgo de Control -----------
 
@@ -99,22 +99,57 @@ module tb_pipeline_hazard;
         // #10;
 
         // BEQ: Comparar si $1 (valor: 5) es igual a $2 (valor: 5), si son iguales, se toma el salto
+        // i_dunit_addr = 32'h0000_0018; 
+        // i_dunit_data_if = 32'b000100_00001_00010_00000_00000_000100; // BEQ $1, $2, offset=4
+        // // Acción esperada: Se toma el salto, el PC se incrementa en 4 instrucciones.
+        // #10;
+
+        // // ADDI: Guardar 1 en $6 de la memoria de registros
+        // i_dunit_addr = 32'h0000_001C;
+        // i_dunit_data_if = 32'b001000_00000_00110_00000_00000_000001; // ADDI $6, $0, 1
+        // // Acción esperada: $6 = 1 (No debe ejecutarse)
+        // #10;
+
+        // // ADDI: Guardar 2 en $7 de la memoria de registros
+        // i_dunit_addr = 32'h0000_002C;
+        // i_dunit_data_if = 32'b001000_00000_00111_00000_00000_000010; // ADDI $7, $0, 2
+        // // Acción esperada: $7 = 2 (Debe ejecutarse después del salto)
+        // #10;
+        // Cargar valores en registros para la comparación
+        i_dunit_addr = 32'h0000_0010;
+        i_dunit_data_if = 32'b001000_00000_00001_00000_00000_000101; // ADDI $1, $0, 5  -> $1 = 5
+        #10;
+
+        i_dunit_addr = 32'h0000_0014;
+        i_dunit_data_if = 32'b001000_00000_00010_00000_00000_000101; // ADDI $2, $0, 5  -> $2 = 5
+        #10;
+
+        //! // Instrucción en EX: LW (carga un valor en $2)! ES PARA PROBAR LOAD STALL
+        // i_dunit_addr = 32'h0000_0010; 
+        // i_dunit_data_if = 32'b100011_00001_00010_00000_00000_000000; // LW $2, 0($1)
+        // #10;
+
+        // // Instrucción en ID: ADD (usa el registro cargado en $2)
+        // i_dunit_addr = 32'h0000_0014; 
+        // i_dunit_data_if = 32'b000000_00010_00011_00100_00000_100000; // ADD $4, $2, $3
+        // #10;
+
+        // BEQ: Comparar si $1 (valor: 5) es igual a $2 (valor: 5), si son iguales, se toma el salto
         i_dunit_addr = 32'h0000_0018; 
         i_dunit_data_if = 32'b000100_00001_00010_00000_00000_000100; // BEQ $1, $2, offset=4
         // Acción esperada: Se toma el salto, el PC se incrementa en 4 instrucciones.
         #10;
 
-        // ADDI: Guardar 1 en $6 de la memoria de registros
+        // Esta instrucción **no debe ejecutarse** si el salto se toma
         i_dunit_addr = 32'h0000_001C;
-        i_dunit_data_if = 32'b001000_00000_00110_00000_00000_000001; // ADDI $6, $0, 1
-        // Acción esperada: $6 = 1 (No debe ejecutarse)
+        i_dunit_data_if = 32'b001000_00000_00110_00000_00000_000001; // ADDI $6, $0, 1  -> $6 = 1 (Debe ser ignorado)
         #10;
 
-        // ADDI: Guardar 2 en $7 de la memoria de registros
+        // Destino del salto (PC = 0x002C)
         i_dunit_addr = 32'h0000_002C;
-        i_dunit_data_if = 32'b001000_00000_00111_00000_00000_000010; // ADDI $7, $0, 2
-        // Acción esperada: $7 = 2 (Debe ejecutarse después del salto)
+        i_dunit_data_if = 32'b001000_00000_00111_00000_00000_000010; // ADDI $7, $0, 2  -> $7 = 2 (Debe ejecutarse)
         #10;
+
 
         i_dunit_w_en = 0;
         i_dunit_reset_pc = 0;

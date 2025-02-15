@@ -43,20 +43,17 @@ module forwarding_unit_ID
 );
 
 // Forwarding logic for rs register
-// assign o_forwardA_ID = (i_rs_id == i_rd_ex_m) && i_regWrite_ex_m;
-
-// // Forwarding logic for rt register
-// assign o_forwardB_ID = (i_rt_id == i_rd_ex_m) && i_regWrite_ex_m;
-
 always @(*) 
 begin
-    if ((i_rs_id == i_rd_ex_m)&& i_regWrite_ex_m) begin
+    //fordward for rs en ID from mem
+    if ((i_rs_id == i_rd_ex_m)&& i_regWrite_ex_m && (i_rd_ex_m != 5'b00000)) begin 
         o_forwardA_ID = 1'b1;
     end
     else begin
         o_forwardA_ID = 1'b0;
     end
-    if ((i_rt_id == i_rd_ex_m) && i_regWrite_ex_m) begin
+    //fordward for rt en ID from mem
+    if ((i_rt_id == i_rd_ex_m) && i_regWrite_ex_m && (i_rd_ex_m != 5'b00000)) begin
         o_forwardB_ID = 1'b1;
     end
     else begin
