@@ -31,21 +31,20 @@ module pc
     output      [PC_WIDTH-1:0] pc_out // Output current PC value
 );
 
-    reg [PC_WIDTH-1:0] pc;
+reg [PC_WIDTH-1:0] pc;
 
 
-    always @(posedge i_clk )
-    begin
-        if (i_reset)
-            pc <= 32'b0;
-        else if (i_enable & PCWrite)
-            pc <= pc_in;
-        else
-            pc <= pc;
+always @(posedge i_clk )
+begin
+    if (i_reset) begin
+        pc <= 32'b0;
     end
+    else if (i_enable & PCWrite) begin
+        pc <= pc_in;
+    end
+end
 
-
-    assign pc_out = pc;
+assign pc_out = pc;
 
     
 endmodule

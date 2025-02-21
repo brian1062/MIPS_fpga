@@ -124,7 +124,7 @@ IF_ID #(
     .NB_REG (NB_REG)
 ) uu_IF_ID(
     .i_clk          (i_clk),
-    .i_reset        (i_reset | w_signals_from_controlU[19] | w_signals_from_controlU[18] | w_PCSrc),   //flush si el salto es tomado
+    .i_reset        (i_reset | (w_PCSrc & i_dunit_clk_en) | (w_signals_from_controlU[19] & i_dunit_clk_en)| (w_signals_from_controlU[18] & i_dunit_clk_en)),// flush si el salto es tomado
     .i_dunit_clk_en (i_dunit_clk_en ),
     .i_pc_four      (w_pcplus4_if_to_ifid),
     .i_data_ins_mem (w_intruction_if),
