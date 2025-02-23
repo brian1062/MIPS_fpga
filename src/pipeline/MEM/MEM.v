@@ -66,43 +66,40 @@ ram_async_single_port #(
     .o_data_to_dunit(o_dunit_mem_data)
 );
 
-/////////////////////////////////////////////////////////////
-// Data Processing - Read
-/////////////////////////////////////////////////////////////
-always @(posedge i_clk) begin
-    if (i_reset) begin
-        read_data <= 32'b0; // Default output
-    end
 
-    case (i_BHW_CU)
-            3'b000: read_data <= {{24{mem_data_out[7]}}, mem_data_out[7:0]};  // LB
-            3'b001: read_data <= {{16{mem_data_out[15]}}, mem_data_out[15:0]}; // LH
-            3'b011: read_data <= mem_data_out;                                // LW
-            3'b100: read_data <= {24'h000000, mem_data_out[7:0]};             // LBU
-            3'b101: read_data <= {16'h0000, mem_data_out[15:0]};             // LHU
-            default: read_data <= mem_data_out[31:0];
-    endcase
-end
 
 always @(*) begin
     if (i_reset) begin
-        mem_data_in <= 32'b0;
+        read_data = 32'b0; // Default output
+        mem_data_in = 32'b0;
     end
 
-    // if(i_mem_write_CU) begin
-        case (i_BHW_CU)
-            3'b000: begin // SB
-                mem_data_in  <= {24'b0, i_mem_data[7:0]};
-            end
-            3'b001: begin // SH
-                mem_data_in  <= {16'b0, i_mem_data[15:0]};
-            end
-            3'b011: begin // SW
-                mem_data_in  <= i_mem_data;
-            end
-            default: mem_data_in <= i_mem_data;
-        endcase
-    // end
+    case (i_BHW_CU)
+        3'b000: begin
+            read_data = {{24{mem_data_out[7]}}, mem_data_out[7:0]};  // LB
+            mem_data_in  <= {24'b0, i_mem_data[7:0]};                //SB
+        end
+        3'b001: begin
+            read_data = {{16{mem_data_out[15]}}, mem_data_out[15:0]}; // LH
+            mem_data_in  <= {16'b0, i_mem_data[15:0]};                //SH
+        end
+        3'b011: begin
+            read_data = mem_data_out;                                // LW
+            mem_data_in  <= i_mem_data;                              // SW
+        end
+        3'b100: begin
+            read_data = {24'h000000, mem_data_out[7:0]};             // LBU
+            mem_data_in <= i_mem_data;                               // SW
+        end
+        3'b101: begin
+            read_data = {16'h0000, mem_data_out[15:0]};             // LHU
+            mem_data_in <= i_mem_data;                              // SW
+        end     
+        default: begin
+            read_data = mem_data_out[31:0];
+            mem_data_in <= i_mem_data;                              // SW
+        end
+    endcase 
 
 end
 
