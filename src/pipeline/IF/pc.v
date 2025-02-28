@@ -34,19 +34,16 @@ module pc
     reg [PC_WIDTH-1:0] pc;
 
 
-    always @(posedge i_clk or posedge i_reset)
+    always @(posedge i_clk )
     begin
         if (i_reset)
-            pc <= 32'd0;
+            pc <= 32'b0;
         else if (i_enable & PCWrite)
             pc <= pc_in;
         else
             pc <= pc;
     end
 
-    initial begin
-        pc <= 0;
-    end
 
     assign pc_out = pc;
 

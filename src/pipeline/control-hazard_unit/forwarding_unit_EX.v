@@ -32,43 +32,47 @@ module forwarding_unit_EX #(
     input              i_RegWrite_from_WB,// RegWrite signal from M/WB stage
 
     // Outputs
-    output reg [1:0]   o_forwardA,         // Forwarding signal for operand A
-    output reg [1:0]   o_forwardB          // Forwarding signal for operand B
+    output  [1:0]   o_forwardA,         // Forwarding signal for operand A
+    output  [1:0]   o_forwardB          // Forwarding signal for operand B
 );
 
 /////////////////////////////////////////////////////////////
 // Forwarding Logic
 /////////////////////////////////////////////////////////////
+reg [1:0] forwardA;
+reg [1:0] forwardB;
 
 always @(*) begin
 
     // Forwarding for o_forwardA
     if (i_RegWrite_from_M && (i_rd_from_M != 0) && (i_rd_from_M == i_rs_from_ID)) 
     begin
-        o_forwardA = 2'b10; // Forward from EX/M stage
+        forwardA = 2'b10; // Forward from EX/M stage
     end 
     else if (i_RegWrite_from_WB && (i_rd_from_WB != 0) && (i_rd_from_WB == i_rs_from_ID)) 
     begin
-        o_forwardA = 2'b01; // Forward from M/WB stage
+        forwardA = 2'b01; // Forward from M/WB stage
     end
     else 
     begin
-        o_forwardA = 2'b00;
+        forwardA = 2'b00;
     end
 
     // Forwarding for o_forwardB
     if (i_RegWrite_from_M && (i_rd_from_M != 0) && (i_rd_from_M == i_rt_from_ID)) 
     begin
-        o_forwardB = 2'b10; // Forward from EX/M stage
+        forwardB = 2'b10; // Forward from EX/M stage
     end 
     else if (i_RegWrite_from_WB && (i_rd_from_WB != 0) && (i_rd_from_WB == i_rt_from_ID)) 
     begin
-        o_forwardB = 2'b01; // Forward from M/WB stage
+        forwardB = 2'b01; // Forward from M/WB stage
     end
     else
     begin
-        o_forwardB = 2'b00;
+        forwardB = 2'b00;
     end
 end
+assign o_forwardA = forwardA;
+assign o_forwardB = forwardB;
 
 endmodule

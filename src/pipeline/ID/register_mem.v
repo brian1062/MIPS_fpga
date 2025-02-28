@@ -37,6 +37,8 @@ module register_mem
     input   [NB_ADDR - 1 : 0]   i_rt_addr       , // Address of the second register to read.
     input   [NB_ADDR - 1 : 0]   i_wb_addr       , // Address of the register to write to.
     input   [NB_REG  - 1 : 0]   i_wb_data       , // Data to write into the specified register.
+    input   [NB_ADDR - 1 : 0]   i_dunit_addr    ,
+    output  [NB_REG  - 1 : 0]   o_dunit_reg     ,
     output  [NB_REG  - 1 : 0]   o_rs_data       , // Data read from the first register.
     output  [NB_REG  - 1 : 0]   o_rt_data         // Data read from the second register.
 );
@@ -69,5 +71,7 @@ end
 /////////////////////////////////////////////////////////////
 assign o_rs_data = reg_mem[i_rs_addr]; // Output data from the first register.
 assign o_rt_data = reg_mem[i_rt_addr]; // Output data from the second register.
+
+assign o_dunit_reg = reg_mem [i_dunit_addr];
    
 endmodule

@@ -18,9 +18,9 @@
 // Inputs:
 // - i_clk: Clock signal (active on positive edge)
 // - i_reset: Asynchronous reset (active high)
-// - i_dunit_clk_en: Enable signal for clock gating in data unit
-// - i_dunit_w_en: Write enable signal for the data unit
-// - i_dunit_addr: Address input for the data unit
+// - i_dunit_clk_en: Enable signal for clock gating in debug unit
+// - i_dunit_w_en: Write enable signal for the debug unit
+// - i_dunit_addr: Address input for the debug unit
 // - i_PCSrc: Selector for PC source (0: PC+4, 1: Immediate)
 // - i_Jump: Control signal for jump operations
 // - i_JSel: Selector for jump address sources
@@ -28,7 +28,7 @@
 // - i_inmed: Immediate value for jump/branch
 // - i_inst_to_mxp: Instruction bits for jump address concatenation
 // - i_pc_jsel: PC value for jump select operations
-// - i_dunit_data: Data input for writing into instruction memory
+// - i_dunit_data: debug input for writing into instruction memory
 // Outputs:
 // - o_pcplus4: Calculated PC+4 value for next instruction
 // - o_instruction: Fetched instruction from instruction memory
@@ -43,17 +43,18 @@ module IF
 (
     input                   i_clk,          // Clock signal
     input                   i_reset,        // Reset signal
-    input                   i_dunit_clk_en, // Clock enable signal for data unit
-    input                   i_dunit_w_en,   // Write enable signal for data unit
-    input  [NB_WIDHT-1:0]   i_dunit_addr,   // Address input for data unit
+    input                   i_dunit_clk_en, // Clock enable signal for debug unit
+    input                   i_dunit_w_en,   // Write enable signal for debug unit
+    input  [NB_REG-1:0]     i_dunit_addr,   // Address input for debug unit
     input                   i_PCSrc,        // Selector for PC source
     input                   i_Jump,         // Jump signal
     input                   i_JSel,         // Selector for jump address
     input                   i_PCWrite,      // Write enable for PC
-    input  [NB_REG-1:0]     i_inmed,        // Immediate value for jump/branch
+    input                   i_dunit_reset_pc,
+    input  [NB_REG-1:0]     i_inmed,        // Immediate value for jump/branch  from ID
     input  [NB_INST-1:0]    i_inst_to_mxp,  // Instruction bits for concatenation
-    input  [NB_REG-1:0]     i_pc_jsel,      // PC value for jump select
-    input  [NB_REG-1:0]     i_dunit_data,   // Data for instruction memory write
+    input  [NB_REG-1:0]     i_pc_jsel,      // PC value for jump select         from ID
+    input  [NB_REG-1:0]     i_dunit_data,   // debug for instruction memory write
     output [NB_REG-1:0]     o_pcplus4,      // Calculated PC+4
     output [NB_REG-1:0]     o_instruction   // Instruction fetched from memory
 );
@@ -63,6 +64,7 @@ wire [NB_REG-1:0] pc_to_mem;        // Current PC value for memory
 wire [NB_REG-1:0] mpx3_to_pc;       // Output of third multiplexer to PC
 wire [NB_REG-1:0] mpx2_to_mpx3;     // Output of second multiplexer
 wire [NB_REG-1:0] mpx1_to_mpx2;     // Output of first multiplexer
+wire [NB_WIDHT-1:0] instr_addr;
 
 
 // First multiplexer: Selects between PC+4 and immediate value
@@ -101,7 +103,7 @@ pc #(
     .PC_WIDTH(NB_REG)
 ) u_pc (
     .i_clk      (i_clk              ),
-    .i_reset    (i_reset            ),
+    .i_reset    (i_reset | i_dunit_reset_pc),
     .i_enable   (i_dunit_clk_en     ),
     .PCWrite    (i_PCWrite          ),
     .pc_in      (mpx3_to_pc         ),
@@ -113,7 +115,7 @@ adder_four #(
     .ADDER_WIDTH(NB_REG) 
 ) u_adder_four (
     .a_input     (pc_to_mem         ),
-    .sum         (o_pcplus4          )
+    .sum         (o_pcplus4         )
 );
 
 // Instruction memory (asynchronous RAM)
@@ -125,9 +127,13 @@ ram_async_single_port #(
       .i_clk       (i_clk       ),
       .i_reset     (i_reset     ),
       .i_we        (i_dunit_w_en),
-      .i_addr      (pc_to_mem[NB_WIDHT-1:0] ),
+      .i_addr      (instr_addr),
       .i_data_in   (i_dunit_data),
-      .o_data_out  (o_instruction)
-  );  
+      .i_dunit_addr(i_dunit_addr[NB_WIDHT-1:0]),
+      .o_data_out  (o_instruction),
+      .o_data_to_dunit()
+  );
+
+assign instr_addr = i_dunit_w_en ? i_dunit_addr[NB_WIDHT-1:0] : pc_to_mem[NB_WIDHT-1:0];
     
 endmodule

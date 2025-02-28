@@ -14,6 +14,7 @@ module tb_MEM;
     reg [NB_WIDTH-1:0]    i_mem_data;
     reg                   i_mem_read_CU;
     reg                   i_mem_write_CU;
+    reg i_dunit_r_data;
     reg [2:0]             i_BHW_CU;
     wire [NB_WIDTH-1:0]   o_read_data;
 
@@ -28,6 +29,7 @@ module tb_MEM;
         .i_mem_addr(i_mem_addr),
         .i_mem_data(i_mem_data),
         .i_mem_read_CU(i_mem_read_CU),
+        .i_dunit_r_data(i_dunit_r_data),
         .i_mem_write_CU(i_mem_write_CU),
         .i_BHW_CU(i_BHW_CU),
         .o_read_data(o_read_data)
@@ -45,6 +47,7 @@ module tb_MEM;
         i_mem_data = 0;
         i_mem_read_CU = 0;
         i_mem_write_CU = 0;
+        i_dunit_r_data = 0;
         i_BHW_CU = 3'b000;
 
         // Reset de la memoria
@@ -64,7 +67,7 @@ module tb_MEM;
         i_mem_addr = 4;
         i_BHW_CU = 3'b000; // LB
         #10 i_mem_read_CU = 0;
-        if (o_read_data == 32'hFFFFFF00) begin
+        if (o_read_data == 32'hFFFFFFFF) begin
             $display("Test de SB y LB exitoso. Valor leido: %h", o_read_data);
         end else begin
             $display("Error en test de SB y LB. Valor leido: %h", o_read_data);
@@ -108,7 +111,7 @@ module tb_MEM;
 
         // LBU (lectura de byte sin signo)
         #10 i_mem_addr = 16;
-        i_mem_data = 32'h00FF0000; // Escribe 0xFF en la dirección 16
+        i_mem_data = 32'h0F0000FF; // Escribe 0xFF en la dirección 16
         i_mem_write_CU = 1;
         i_BHW_CU = 3'b100; // SB
         #10 i_mem_write_CU = 0;
@@ -126,7 +129,7 @@ module tb_MEM;
 
         // LHU (lectura de halfword sin signo)
         #10 i_mem_addr = 20;
-        i_mem_data = 32'h00FF0000; // Escribe 0xFF00 en la dirección 20
+        i_mem_data = 32'h0000FF00; // Escribe 0xFF00 en la dirección 20
         i_mem_write_CU = 1;
         i_BHW_CU = 3'b101; // SH
         #10 i_mem_write_CU = 0;
