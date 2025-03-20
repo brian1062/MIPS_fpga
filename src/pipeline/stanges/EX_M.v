@@ -1,3 +1,32 @@
+//===========================================
+// Module: EX_M
+// Description:
+//    Pipeline register between Execute (EX) and Memory (MEM) stages.
+//    Stores ALU results, memory write data, destination addresses, and control signals.
+//    Facilitates data flow synchronization in the pipeline.
+// Author: Brian Gerard
+// Created: 11/12/2024
+// Parameters:
+// - NB_REG: Bit width for registers and data buses (default: 32).
+// - NB_ADDR: Bit width for register/destination addresses (default: 5).
+// - NB_CTRL: Bit width for control signals (default: 9).
+// Inputs:
+// - i_clk: System clock signal.
+// - i_reset: Synchronous reset (flushes pipeline register).
+// - i_dunit_clk_en: Debug unit clock enable for controlled updates.
+// - i_pc_eight: PC+8 value from EX stage [31:0].
+// - i_alu_result: ALU computation result [31:0].
+// - i_w_data: Data to be written to memory [31:0].
+// - i_data_addr: Destination register address for writeback [4:0].
+// - i_control_from_ex: Control signals propagated from EX stage [8:0].
+// Outputs:
+// - o_pc_eight: Registered PC+8 to MEM stage [31:0].
+// - o_alu_result: Registered ALU result to MEM stage [31:0].
+// - o_w_data: Registered memory write data to MEM stage [31:0].
+// - o_data_addr: Registered destination address to MEM stage [4:0].
+// - o_control_from_ex: Propagated control signals to MEM stage [8:0].
+//===========================================
+
 module EX_M 
 #(
     parameter NB_REG =  32,
