@@ -1,4 +1,30 @@
 #!/usr/bin/env python3
+#===========================================
+# Script: fpga.py
+# Description:
+#    Facilitates communication with a MIPS processor via UART for debugging purposes.
+#    Supports program loading, step-by-step execution, runtime monitoring, and pipeline state inspection.
+#    Interfaces with FPGA to read/write registers, memory, and internal pipeline states.
+# Key Features:
+#    - COE file parsing for program loading
+#    - Serial communication management (19200 baud, 8N1)
+#    - Non-zero register/memory visualization
+#    - Pipeline stage register decoding (IF_ID, ID_EX, EX_M, M_WB)
+# Author: Brian Gerard
+# Created: 12/02/2025
+# Communication Parameters:
+#    - BAUDRATE: 19200
+#    - BYTESIZE: 8 bits
+#    - PARITY: None
+#    - STOPBITS: 1
+# Supported Commands:
+#    - LOAD_PROGRAM (0x04): Load binary program from .coe file
+#    - RUN (0x03): Continuous execution until HALT
+#    - STEP (0x05): Single-cycle execution
+#    - RESET (0x0C): Processor reset
+# Dependencies:
+#    - pyserial (3.5+)
+#===========================================
 import serial
 import time
 import sys
