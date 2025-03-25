@@ -1,3 +1,39 @@
+//===========================================
+// Module: pipeline
+// Description:
+//    Implements a multi-stage pipeline processor (IF, ID, EX, MEM, WB).
+//    Integrates hazard detection, forwarding units, and pipeline registers 
+//    to manage data dependencies and control flow. Interfaces with instruction 
+//    memory, data memory, and debug units for monitoring internal states.
+// Author: Brian Gerard
+// Created: 12/02/2025
+// Parameters:
+// - NB_REG: Bit width for registers and data buses (default: 32).
+// - NB_WIDHT: Address width for instruction/data memory (default: 9).
+// - NB_OP: Bit width for opcode field (default: 6).
+// - NB_ADDR: Bit width for register addresses (e.g., rs, rt) (default: 5).
+// - NB_IFID: Width of IF/ID pipeline register (default: 64).
+// - NB_IDEX: Width of ID/EX pipeline register (default: 144).
+// - NB_EXM: Width of EX/MEM pipeline register (default: 88).
+// - NB_MWB: Width of MEM/WB pipeline register (default: 80).
+// Inputs:
+// - i_clk: System clock signal.
+// - i_reset: Global reset signal.
+// - i_dunit_clk_en: Debug unit clock enable.
+// - i_dunit_reset_pc: Debug signal to reset the program counter.
+// - i_dunit_w_mem: Debug signal to write to instruction memory.
+// - i_dunit_addr: Debug address for memory/register access.
+// - i_dunit_data_if: Debug data input for instruction memory.
+// Outputs:
+// - o_dunit_reg: Debug output for register file contents.
+// - o_dunit_mem_data: Debug output for data memory contents.
+// - o_IF_ID: IF/ID pipeline register snapshot for debugging.
+// - o_ID_EX: ID/EX pipeline register snapshot for debugging.
+// - o_EX_M: EX/MEM pipeline register snapshot for debugging.
+// - o_M_WB: MEM/WB pipeline register snapshot for debugging.
+// - o_halt: Signal indicating a HALT instruction completion.
+//===========================================
+
 module pipeline #(
     parameter NB_REG  =32 ,
     parameter NB_WIDHT=9  , // for widht addr in instruction memory or datamemory
@@ -124,7 +160,9 @@ IF_ID #(
     .NB_REG (NB_REG)
 ) uu_IF_ID(
     .i_clk          (i_clk),
-    .i_reset        (i_reset | w_signals_from_controlU[19] | w_signals_from_controlU[18] | w_PCSrc),   //flush si el salto es tomado
+    .i_reset        (i_reset  | (w_signals_from_controlU[19] & i_dunit_clk_en)
+                    | (w_signals_from_controlU[18] & i_dunit_clk_en)
+                    | (w_PCSrc & i_dunit_clk_en & !w_stall)),// | (w_PCSrc & i_dunit_clk_en) flush si el salto es tomado
     .i_dunit_clk_en (i_dunit_clk_en ),
     .i_pc_four      (w_pcplus4_if_to_ifid),
     .i_data_ins_mem (w_intruction_if),
@@ -224,7 +262,7 @@ ID_EX #(
     .NB_ADDR  (NB_ADDR)
 ) u_ID_EX(
     .i_clk           (i_clk),
-    .i_reset         (i_reset | w_flush),//,w_signals_from_controlU[19]),
+    .i_reset         (i_reset | (w_flush & i_dunit_clk_en)),//,w_signals_from_controlU[19]),
     .i_dunit_clk_en  (i_dunit_clk_en),
     .i_pc_eight      (w_pc8_id_idex),
     .i_rs_data       (w_rs_data_id_idex),

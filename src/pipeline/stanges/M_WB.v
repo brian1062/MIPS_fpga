@@ -1,3 +1,32 @@
+//===========================================
+// Module: M_WB
+// Description:
+//    Pipeline register between Memory (MEM) and Write-Back (WB) stages.
+//    Stores memory read data, ALU results, destination addresses, and control signals.
+//    Ensures synchronized data delivery for register writeback and final result selection.
+// Author: Brian Gerard
+// Created: 11/12/2024
+// Parameters:
+// - NB_REG: Bit width for registers and data buses (default: 32).
+// - NB_CTRL: Bit width for control signals (default: 4).
+// - NB_ADDR: Bit width for register/destination addresses (default: 5).
+// Inputs:
+// - i_clk: System clock signal.
+// - i_reset: Synchronous reset (flushes pipeline register).
+// - i_dunit_clk_en: Debug unit clock enable for controlled updates.
+// - i_pc_eight: PC+8 value from MEM stage [31:0].
+// - i_read_data: Data read from memory subsystem [31:0].
+// - i_alu_res_ex_m: ALU result forwarded from MEM stage [31:0].
+// - i_data_addr_ex_m: Destination register address for writeback [4:0].
+// - i_control_from_m: Control signals from MEM stage [3:0].
+// Outputs:
+// - o_pc_eight: Registered PC+8 to WB stage [31:0].
+// - o_read_data: Registered memory read data to WB stage [31:0].
+// - o_alu_res_ex_m: Registered ALU result to WB stage [31:0].
+// - o_data_addr_ex_m: Propagated destination address to WB stage [4:0].
+// - o_control_from_m: Propagated control signals to WB stage [3:0].
+//===========================================
+
 module M_WB 
 #(
     parameter NB_REG = 32,

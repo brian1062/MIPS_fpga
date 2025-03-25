@@ -1,3 +1,38 @@
+Copy
+
+//===========================================
+// Module: debug_unit
+// Description:
+//    Manages communication between a host and the MIPS processor via UART.
+//    Handles program loading, step-by-step execution, runtime monitoring, 
+//    and debugging. Interfaces with registers, memory, and internal pipeline 
+//    states for data exchange and control.
+// Author: Brian Gerard
+// Created: 12/02/2025
+// Parameters:
+// - NB_REG: Bit width for registers and data buses (default: 32).
+// - NB_R_INT: Bit width for internal register snapshot (default: 376).
+// - DBIT: Number of data bits per UART frame (default: 8).
+// - SB_TICK: Stop bit ticks for UART (default: 16).
+// - DVSR: Baud rate divisor (Clock/(BaudRate*16)) (default: 326).
+// - DVSR_BIT: Bit width for baud rate divisor (default: 9).
+// - FIFO_W: FIFO buffer depth (2^FIFO_W entries) (default: 5).
+// Inputs:
+// - i_clk: System clock signal.
+// - i_reset: Global reset signal.
+// - i_rx: UART receive data line.
+// - i_reg_data: Register data from MIPS for debugging.
+// - i_mem_data: Data memory contents for debugging.
+// - i_reg_int: Internal pipeline register states for debugging.
+// - i_halt: Signal indicating processor halt.
+// Outputs:
+// - o_tx: UART transmit data line.
+// - o_w_mem: Write enable for instruction memory.
+// - o_inst: Instruction data to be written to memory.
+// - o_addr_inst: Address for instruction memory access.
+// - o_enable: Processor execution enable signal.
+// - o_reset_mips: Reset signal for MIPS processor.
+//===========================================
 module debug_unit 
 #(
     parameter NB_REG  = 32,

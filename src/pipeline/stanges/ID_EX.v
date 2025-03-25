@@ -1,3 +1,40 @@
+//===========================================
+// Module: ID_EX
+// Description:
+//    Pipeline register between Instruction Decode (ID) and Execute (EX) stages.
+//    Stores operands, control signals, sign-extended immediates, and register addresses.
+//    Ensures synchronized data flow  in the processor pipeline.
+// Author: Brian Gerard
+// Created: 11/12/2024
+// Parameters:
+// - NB_REG: Bit width for registers and data buses (default: 32).
+// - NB_CTRL: Bit width for control signals (default: 16).
+// - NB_OP: Bit width for opcode/operation field (default: 6).
+// - NB_ADDR: Bit width for register addresses (rs/rt/rd) (default: 5).
+// Inputs:
+// - i_clk: System clock signal.
+// - i_reset: Synchronous reset (flushes pipeline register).
+// - i_dunit_clk_en: Debug unit clock enable for controlled updates.
+// - i_pc_eight: PC+8 value from ID stage [31:0].
+// - i_rs_data: RS register data from ID stage [31:0].
+// - i_rt_data: RT register data from ID stage [31:0].
+// - i_sign_extension: Sign-extended immediate value [31:0].
+// - i_control_unit: Control signals from ID stage [15:0].
+// - i_operation: Opcode/operation type [5:0].
+// - i_rs_addr: RS register address [4:0].
+// - i_rt_addr: RT register address [4:0].
+// - i_rd_addr: RD register address [4:0].
+// Outputs:
+// - o_pc_eight: Registered PC+8 to EX stage [31:0].
+// - o_rs_data: Registered RS data to EX stage [31:0].
+// - o_rt_data: Registered RT data to EX stage [31:0].
+// - o_sign_extension: Registered sign-extended immediate [31:0].
+// - o_control_unit: Propagated control signals to EX stage [15:0].
+// - o_operation: Registered opcode to EX stage [5:0].
+// - o_rs_addr: RS address for hazard detection [4:0].
+// - o_rt_addr: RT address for hazard detection [4:0].
+// - o_rd_addr: RD address for writeback [4:0].
+//===========================================
 module ID_EX 
 #(
     parameter NB_REG = 32,
